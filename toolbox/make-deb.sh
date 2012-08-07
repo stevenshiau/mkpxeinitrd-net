@@ -18,6 +18,7 @@ echo "BUSYBOX VER: $BUSYBOX_VER"
 
 #
 TARBALL=$PKG-$VER.tar.bz2
+TARBALL_ORIG=${PKG}_${VER}.orig.tar.bz2
 busybox_pkg="busybox-$BUSYBOX_VER.tar.bz2"
 
 # check
@@ -26,9 +27,10 @@ busybox_pkg="busybox-$BUSYBOX_VER.tar.bz2"
 # mkdir for build
 rm -rf debforge/*
 mkdir -p debforge/
+(cd debforge; ln -fs ../$TARBALL $TARBALL_ORIG)
 tar -xvjf $TARBALL -C debforge/
 [ -e "$busybox_pkg" ] && cp $busybox_pkg debforge/$PKG-$VER/initrd/
 cp -a debian debforge/$PKG-$VER/
 cd debforge/$PKG-$VER
-#dpkg-buildpackage -rfakeroot
 debuild --no-tgz-check --no-lintian
+rm -f $TARBALL_ORIG

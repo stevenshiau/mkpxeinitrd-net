@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash
 PKG="mkpxeinitrd-net"
 RPMBUILD="${HOME}/rpmbuild/"
 SPEC_FILE="$PKG.spec"
