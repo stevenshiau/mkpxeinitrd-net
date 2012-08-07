@@ -1,3 +1,11 @@
+mkpxeinitrd-net (2.0.0-drbl1) unstable; urgency=low
+
+  * Mkpxeinitrd-net version 2. New files arch so it's easier to be packaged in Debian.
+  * New upstream busybox 1.20.2.
+  * Replacing drbl.nchc.org.tw with drbl.org in the prompt messages.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Tue, 07 Aug 2012 22:04:04 +0800
+
 mkpxeinitrd-net (1.6.12-1drbl) unstable; urgency=low
 
   * Bug fixed: "mount --move -n /run /sysroot/run" insetad of "mount -n -o move /run /sysroot/run" in linuxrc-or-init.
