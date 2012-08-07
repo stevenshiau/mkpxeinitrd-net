@@ -1,0 +1,82 @@
+# -*-Shell-script-*-
+# Function copy_exec_not_link is borrowed from copy_exec from Debian's package initramfs-tools: /usr/share/initramfs-tools/hook-functions. The difference is that we use "cp -pL" instead of "ln -fs" in this function. This is because when we run mkpxeinitrd-net, we run cpio without "--dereference" (mkinitramfs uses cpio with "--dereference"), i.e. in mkpxeinitrd-net, we use:
+ # find . | cpio --quiet -o -H newc | gzip -9 > $output_dir/initrd-$initrd_suffix.$kernel_ver.img )
+ # instead of
+ # find . | cpio --quiet --dereference -o -H newc | gzip -9 > $output_dir/initrd-$initrd_suffix.$kernel_ver.img )
+ # The reason to do so is we use symbolic link to link the command to busybox in/usr/lib/mkpxeinitrd-net/initrd-skel/bin/. If we use --dereference, it will take a lot of space. This might be improved in the future.
+ 
+# $1 is the source path (e.g. /usr/bin/time)
+# $2 is the relative destination (e.g. /usr or /usr/time)
+#
+# The destination is interpreted in the same way "cp" would, meaning
+# (assuming /bin is a directory):
+#
+#   "copy_exec_not_link /usr/bin/time /bin"        -> /bin/time
+#   "copy_exec_not_link /usr/bin/time /bin/mytime" -> /bin/mytime
+# 
+# If $2 is left out, the same destination path as for the source arg will
+# be used and directories will be created as needed, so:
+#
+#   "copy_exec_not_link /usr/bin/time"             -> /usr/bin/time
+#
+copy_exec_not_link() {
+	local source target destination final_destination x nonoptlib
+	local libname dirname
+
+	source="${1}"
+	if [ -n "${2}" ]; then
+		target="${2}"
+	else
+		if [ ! -e "${DESTDIR}/$(dirname "${1}")" ]; then
+			mkdir -p "${DESTDIR}/$(dirname "${1}")"
+		fi
+		target="${1}"
+	fi
+
+	if [ -d "${DESTDIR}/${target}" ]; then
+		destination="${target}/$(basename "${source}")"
+	else
+		destination="${target}"
+	fi
+	final_destination="${DESTDIR}/${destination}"
+
+	if [ -L "$final_destination" ]; then
+		if [ $(readlink "${final_destination}") != "${source}" ]; then
+			echo "W:copy_exec_not_link: Not copying ${source} to \$DESTDIR${destination}, which is already a copy of $(readlink ${final_destination})" >&2
+			return
+		fi
+	else
+		cp -pL ${source} ${DESTDIR}/${destination}
+		if [ "${verbose}" = "y" ]; then
+			echo "Adding binary ${source}"
+		fi
+	fi
+
+	# Copy the dependant libraries
+	for x in $(ldd ${source} 2>/dev/null | sed -e '
+	    /\//!d;
+	    /linux-gate/d;
+	    /=>/ {s/.*=>[[:blank:]]*\([^[:blank:]]*\).*/\1/};
+	    s/[[:blank:]]*\([^[:blank:]]*\) (.*)/\1/' 2>/dev/null); do
+
+		# Try to use non-optimised libraries where possible.
+		# We assume that all HWCAP libraries will be in tls,
+		# sse2, vfp or neon
+		nonoptlib=$(echo "${x}" | sed -e 's#/lib/\(tls\|i686\|sse2\|neon\|vfp\).*/\(lib.*\)#/lib/\2#')
+
+		if [ -e "${nonoptlib}" ]; then
+			x="${nonoptlib}"
+		fi
+
+		libname=$(basename "${x}")
+		dirname=$(dirname "${x}")
+
+		mkdir -p "${DESTDIR}/${dirname}"
+		if [ ! -e "${DESTDIR}/${dirname}/${libname}" ]; then
+			cp -pL "${x}" "${DESTDIR}/${dirname}"
+			if [ "${verbose}" = "y" ]; then
+				echo "Adding library ${x}"
+			fi
+		fi
+	done
+} # end of copy_exec_not_link

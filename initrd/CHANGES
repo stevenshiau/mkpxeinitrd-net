@@ -1,0 +1,17 @@
+mkpxeinitrd-net
+===
+
+Version 1.0 (2006-Dec-29)
+-------------
+
+mkpxeinitrd-net is a derived program from mkinitrd-net. In DRBL, PXE mechanism is the only network boot method. Since from Etherboot 5.4.0, the PXE compatable one is available. Therefore no more NBI.
+The reason we'd like to have a new name is that we do not want to let people be confused, since now these two programs mkpxeinitrd-net and mkinitrd-net have different functions and runtime parameters.
+
+Many thanks to Michael Brown and Fen Systems Ltd. so that we can have this.
+
+Steven Shiau <steven _at_ nchc org tw> Oct/29/2005.
+
+Version 1.2.1 (2006-Dec-11)
+-------------
+
+linuxrc is renamed to linuxrc-or-init, since now mkpxeinitrd-net supports initrd or initramfs. It will be renamed to linuxrc or init by /usr/bin/mkpxeinitrd-net, depends on it's initrd or initramfs.

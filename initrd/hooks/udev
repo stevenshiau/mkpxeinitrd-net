@@ -1,0 +1,86 @@
+#!/bin/bash
+# initramfs hook for udev
+# This program was modified from the package udev of Debian (/usr/share/initramfs-tools/hooks/udev) by Steven Shiau on 2009/Aug/25
+
+MINKVER="2.6.24"
+PREREQ=""
+
+# Output pre-requisites
+prereqs()
+{
+	echo "$PREREQ"
+}
+
+case "$1" in
+    prereqs)
+	prereqs
+	exit 0
+	;;
+esac
+
+
+# Load functions
+. /usr/lib/mkpxeinitrd-net/mkpxeinitrd-net-func
+
+# We use pkill
+copy_exec_not_link /usr/bin/pkill /sbin
+
+# Copy across the udev binaries
+[ -e /sbin/udevd ] && copy_exec_not_link /sbin/udevd /sbin
+[ -e /sbin/udevadm ] && copy_exec_not_link /sbin/udevadm /sbin
+
+# Copy udev configuration
+mkdir -p ${DESTDIR}/etc/udev
+mkdir -p ${DESTDIR}/lib/udev
+
+cp -pL /etc/udev/udev.conf ${DESTDIR}/etc/udev
+
+# It's hard to tell them, just copy all of them.
+if [ -d "/etc/udev/rules.d" ]; then
+  mkdir -p ${DESTDIR}/etc/udev/rules.d
+  cp -pL /etc/udev/rules.d/* ${DESTDIR}/etc/udev/rules.d/
+fi
+if [ -d "/lib/udev/rules.d" ]; then
+  mkdir -p ${DESTDIR}/lib/udev/rules.d
+  cp -pL /lib/udev/rules.d/* ${DESTDIR}/lib/udev/rules.d/
+fi
+
+# Copy across helpers the rules need
+# 50-udev-default.rules
+# 60-persistent-storage.rules
+# /lib/udev/ata_id
+# /lib/udev/usb_id
+# /lib/udev/scsi_id
+# /lib/udev/path_id
+
+# 61-persistent-storage-edd.rules
+# /lib/udev/edd_id
+
+# sbin_udev_files_list is for those udev-related files in /sbin/
+# lib_udev_files_list is for those udev-related files in /lib/udev/. Some more will be got using for loop
+sbin_udev_files_list="blkid pam_console_apply"
+lib_udev_files_list="modprobe rename_device pci-db hwclock-set net.agent console-setup-tty"
+
+# (1) For /sbin/ first
+for i in $sbin_udev_files_list; do
+  [ -e "/sbin/$i" ] && copy_exec_not_link /sbin/$i /sbin/
+done
+
+# (2) Then for /lib/udev
+# For files /lib/udev/*_id, e.g. ata_id usb_id scsi_id path_id edd_id
+# For files /lib/udev/udev*, e.g. udevpermconv.sh  udev_run_devd  udev_run_hotplugd
+# For files /lib/udev/udisk* (udisk, from Ubuntu 11.10), e.g.  udisks-dm-export  udisks-probe-ata-smart udisks-lvm-pv-export  udisks-probe-sas-expander udisks-part-id
+
+for i in /lib/udev/*_id /lib/udev/udev* /lib/udev/udisks*; do
+  lib_udev_files_list="$lib_udev_files_list $(basename $i)"
+done
+for i in $lib_udev_files_list; do
+  [ -e "/lib/udev/$i" ] && copy_exec_not_link /lib/udev/$i /lib/udev/
+done
+
+# For RH-like system
+if [ -e "/etc/sysconfig/network-scripts/net.hotplug" ]; then
+  # DESTDIR is the environmental variable.
+  mkdir -p $DESTDIR/etc/sysconfig/network-scripts/
+  copy_exec_not_link /etc/sysconfig/network-scripts/net.hotplug /etc/sysconfig/network-scripts/
+fi

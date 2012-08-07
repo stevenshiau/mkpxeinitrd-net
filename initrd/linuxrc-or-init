@@ -1,0 +1,304 @@
+#!/bin/sh
+# Authors: Steven Shiau <steven _at_ nchc org tw> and K. L. Huang <klhaung _at_ gmail.com>
+# License: GPL
+
+# This file will be renamed to linuxrc or init by /usr/bin/mkpxeinitrd-net, depends on it's initrd or initramfs.
+
+# Load setting
+. /etc/linuxrc.conf
+# We can assign the priority of network card to request IP address, 
+# not from the results of auto detection.
+. /etc/netdev.conf
+start_udevd=""
+
+#
+PATH=/sbin:/bin
+
+#
+mk_basic_dev() {
+  $echo "Creating root device"
+  mknod -m 700 /dev/root b 1 0
+  mknod /dev/console c 5 1
+  mknod /dev/null c 1 3
+  mknod /dev/zero c 1 5
+  mknod /dev/ram b 1 1
+  mknod /dev/systty c 4 0
+  for i in 0 1 2 3 4 5 6 7 8; do mknod -m 666 /dev/tty$i c 4 $i; done
+  $echo "Creating random device"
+  mknod -m 444 /dev/random c 1 8
+  mknod -m 644 /dev/urandom c 1 9
+  mknod -m 640 /dev/mem c 1 1
+  mkdir /dev/pts
+  mkdir /dev/shm
+  mkdir /dev/usb
+  for i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+    mknod /dev/usb/hiddev${i} c 180 $((96+i))
+  done
+}
+
+# Two possibilities for initfs_type: 
+# (1) initrd (ext2, cramfs): in this case, just let initfs_type is empty. "linuxrc" will be the first program to be run in initrd.
+# (2) initramfs: set initfs_type as initramfs. "init" will be the first program to be run. 
+initfile="$0"
+if [ "${initfile##*/}" = "init" ]; then
+  initfs_type=initramfs
+else
+  initfs_type=initrd
+fi
+
+echo Busybox $initfile starting
+
+[ -d /dev ] || mkdir -m 0755 /dev
+[ -d /root ] || mkdir -m 0700 /root
+[ -d /sys ] || mkdir /sys
+[ -d /proc ] || mkdir /proc
+[ -d /tmp ] || mkdir /tmp
+mkdir -p /var/lock
+echo Trying to mount /sys filesystem
+mount -n -t sysfs -o nodev,noexec,nosuid none /sys 
+echo Mounting /proc filesystem
+mount -n -t proc -o nodev,noexec,nosuid none /proc 
+
+if [ "$use_dev_pts_in_initrd" = "yes" ]; then
+  mkdir /dev/pts
+  mount -t devpts -o noexec,nosuid,gid=5,mode=0620 devpts /dev/pts || true
+fi
+
+if [ "$use_run_in_initrd" = "yes" ]; then
+  mkdir /run
+  mount -t tmpfs -o "nosuid,size=20%,mode=0755" tmpfs /run
+  mkdir /run/initramfs
+fi
+
+echo=echo
+if grep '\bquiet\b' /proc/cmdline > /dev/null; then
+  echo=true
+  quiet=1
+fi
+
+# /dev/
+# We only will start udevd when it supports daemon mode. Otherwise like the udevd in CentOS 4.8, it will hang.
+if [ -e /etc/udev/udev.conf ] && \
+   [ -n "$(LC_ALL=C strings /sbin/udevd 2>/dev/null | grep -- "--daemon")" ]
+then
+   start_udevd="yes"
+else
+   start_udevd="no"
+fi
+if [ "$start_udevd" = "yes" ]; then
+  # udev
+  # Note that this only becomes /dev on the real filesystem if udev's scripts
+  # are used; which they will be, but it's worth pointing out
+  $echo "Starting udev..."
+  # Use udev
+  tmpfs_size="10M"
+  . /etc/udev/udev.conf
+  mount -n -t tmpfs -o size=$tmpfs_size,mode=0755 udev /dev
+  > /dev/.initramfs-tools
+  mkdir /dev/.initramfs
+  mk_basic_dev
+  # It's all over netlink now
+  echo "" > /proc/sys/kernel/hotplug
+  
+  # Start the udev daemon to process events
+  resolve_name_opt=""
+  # Instead of using "/sbin/udevd --help", we use strings here. 
+  # This workaround is to avoid this weird case:
+  # http://sourceforge.net/projects/drbl/forums/forum/394007/topic/3729074
+  if [ -n "$(LC_ALL=C strings /sbin/udevd 2>/dev/null | grep -- "--resolve-names")" ]; then
+   resolve_name_opt="--resolve-names=never"
+  fi
+  /sbin/udevd --daemon $resolve_name_opt
+  
+  # Iterate sysfs and fire off everything; if we include a rule for it then
+  # it'll get handled; otherwise it'll get handled later when we do this again
+  # in the main boot sequence.
+  if [ -x /sbin/udevadm ]; then
+    ( /sbin/udevadm trigger --subsystem-match=block; \
+      /sbin/udevadm trigger --subsystem-nomatch=block; ) &
+  fi
+else
+  # Manually create dev files first. Later actually it will change to the dev system from GNU/Linux system.
+  $echo "Creating files in /dev/..."
+  # /dev will be the only writable place for this initrd if it's cramfs, so
+  # we will also use /dev to store some info temporarily. Laster we will clean
+  # those temp files.
+  mount -n -t tmpfs -n -o nr_inodes=24576,mode=0755 none /dev
+  mkdir /dev/.initramfs
+  mk_basic_dev
+fi
+
+# splash. Borrowed from Ubuntu 9.10
+if grep -iq splash /proc/cmdline && [ -x /sbin/usplash ]; then
+  #/sbin/usplash -c -t 60 --background --pidfile usplash.pid
+  # //NOTE// The above fails in DRBL client, no idea why... Hence we use "&" to run it in the background
+  /sbin/usplash -c -t 60 &
+fi
+
+echo 0x100 > /proc/sys/kernel/real-root-dev
+# make a writable file so the /etc/resolv.conf can link to /dev/resolv.conf
+# so that udpcpc won't complain unable to write. 
+echo > /dev/resolv.conf
+
+$echo "Loading network device modules..."
+if [ -z "$quiet" ]; then
+  /bin/insert-modules
+else
+  /bin/insert-modules >/dev/null
+fi
+
+$echo "Bringing up loopback interface"
+ifconfig lo 127.0.0.1 up
+route add -net 127.0.0.0 netmask 255.0.0.0 lo
+
+# IF the netdevices is not assign in /etc/netdev.conf, we use get-nic-devs to detect the network devices and do dhcpc request each one
+if [ -z "$netdevices" ]; then
+  netdevs="$(get-nic-devs)"
+  netdev_priority=""
+  netdev_nopriority=""
+  echo -n "Try to up "
+  for i in $netdevs; do
+    echo -n "$i..."
+    ifconfig $i 0.0.0.0
+  done
+  echo
+  # link_detect_timeout is from linuxrc.conf. Its unit is 0.1 secs.
+  for i in $netdevs; do
+    #link_status="$(ethtool $DEVICE | grep -i "Link detected:" | cut -d":" -f2 | sed -e "s/ //g")"
+    # If "1" in /sys/class/net/$i/carrier means linked.
+    echo -n "Waiting for $i to be linked..."
+    while [ -z "$(grep "1" /sys/class/net/$i/carrier 2>/dev/null)" ]; do
+      echo -n "."
+      # decrease 0.1 secs
+      sleep 0.1
+      link_detect_timeout=$(( $link_detect_timeout - 1 ))
+      if [ $link_detect_timeout -le 0 ]; then
+        echo "Time out!"
+      	break
+      fi
+    done 
+    echo
+    if [ -n "$(grep "1" /sys/class/net/$i/carrier 2>/dev/null)" ]; then
+      # NIC $i is linked, put it in the priority list
+      netdev_priority="$netdev_priority $i"
+    else
+      netdev_no_priority="$netdev_no_priority $i"
+    fi
+  done
+  netdevices="$(echo "$netdev_priority $netdev_no_priority" | sed -e 's/^[[:space:]]*//g')"
+fi
+$echo "Obtaining IP address via DHCP..."
+$echo "The order of network card to request IP address is: $netdevices"
+
+if  [ -n "$udhcpc_port" ]; then
+  echo "Special udhcpc requests port: $udhcpc_port."
+  udhcpc_port_opt="-P $udhcpc_port"
+fi
+
+# seed /dev/urandom by any method 
+ifconfig > /dev/urandom
+
+for device in $netdevices; do
+  $echo "Trying to obtain IP address via [$device]..."
+  $echo "Maximum times to try in this port [$device]: $iretry_max."
+  servername=""
+  iretry=0
+  while [ "$iretry" -lt "$iretry_max" ]; do
+    iretry=$(($iretry+1))
+    echo "Leasing IP address via [$device]. Try $iretry..."
+    udhcpc -i $device -f --clientid-none --vendorclass="$vendor_class_id" $udhcpc_port_opt -n -q -s /bin/udhcpc-post
+    # We use the writable dir /dev/ to store the sname, and sname will be removed when it's not used anymore.
+    [ -f "/dev/sname" ] && servername=`cat /dev/sname`
+    # Do we want to check server name ?
+    case "$check_server_name" in
+      n|N|[nN][oO])
+        # once got the IP from DRBL server via any port, stop try other port.
+	if [ -z "$servername" ]; then
+          # got nothing
+          echo "Unable to obtain IP address via wired link [$device]!"
+        else
+          # got anyone from any dhcp server.
+	  echo "DHCP server name is: $servername."
+          echo "Successfully obtained IP address via wired link [$device]" 
+	  break 2
+        fi
+        ;;
+      *)
+        # Default is to check the servername is from $dhcp_server_name or not.
+	echo "Only IP address offered by this DHCP server name will be accepted: $servername"
+        if [ "$servername" = "$dhcp_server_name" ]; then
+          # got the right IP from DRBL server, so go on
+	  echo "DHCP server name is: $servername."
+          echo "Successfully obtained IP address via wired link [$device]" 
+          break 2
+        else
+          if [ -z "$servername" ]; then
+            # got nothing
+            echo "Unable to obtain IP address via wired link [$device]!"
+          else
+            echo "The IP address got is NOT from DRBL server...Try to get another one..." 
+          fi
+        fi
+        ;;
+    esac
+  done
+done
+
+# clean the tag file
+[ -f "/dev/sname" ] && rm -f /dev/sname
+
+if [ "$start_udevd" = "yes" ]; then
+  # Stop udevd, we'll miss a few events while we run init, but we catch up
+  pkill udevd
+  
+  # udevd might have been in the middle of something when we killed it,
+  # but it doesn't matter because we'll do everything again in userspace
+  rm -rf /dev/.udev/queue
+fi
+
+if [ -d /sysroot/run ]; then
+  mount --move -n /run/ /sysroot/run
+fi
+
+if [ -d /sysroot/initrd ]; then
+  $echo "Unmounting /proc and /sys prior to pivot_root or switch_root"
+  umount -n /proc 2>/dev/null
+  umount -n /sys 2>/dev/null
+
+  $echo "Remounting dev at correct place"
+  # No more devfs, we use tmpfs and tarball dev (created in drblsrv) or udev
+  #mount -t tmpfs -n -o bind /dev/ /sysroot/dev
+  mount --move -n /dev/ /sysroot/dev
+
+  if [ "$initfs_type" = "initramfs" ]; then
+    echo "Use switch_root to exit initramfs"
+    echo "Finished busybox $initfile! Enter DRBL init!"
+    exec switch_root -c /dev/console /sysroot /sbin/init
+  else
+    echo "Use pivot_root to exit initrd"
+    $echo "Pivoting root to /sysroot"
+    pivot_root /sysroot /sysroot/initrd
+    # From now on, original files in initrd are in /sysroot/initrd/ 
+    # (Ex: /sysroot/initrd/bin/busybox), and 
+    # / is mounted from $NFSSERVER:/tftpboot/node_root/
+    cd /
+    
+    $echo "Releasing locks on old dev"
+    exec </dev/null >/dev/console 2>&1
+    
+    echo "Finished busybox $initfile! Enter DRBL init!"
+  fi
+else
+  kernel_ver=$(uname -r)
+  # Failed to mount root: report error and enter shell to debug
+  echo "***********************************************************"
+  echo "FATAL ERROR: Failed to mount root filesystem!!! Please check:"
+  echo "1. Is the driver of the network card loaded successfully in this computer ? Press Shift-PageUp to check the message in the screen ? If not, maybe this network card is too new so in this kernel \"$kernel_ver\" a suitable driver is not available! Run /bin/ls_pciid.sh then compare the results with the file /usr/lib/mkpxeinitrd-net/initrd-skel/etc/pcitable in the DRBL server."
+  echo "2. The TCPwrapper setting (/etc/hosts.allow and /etc/hosts.deny) and firewall rules in your DRBL server, do you block the clients ?"
+  echo "3. Is there any other DHCP server (server name is NOT \"$dhcp_server_name\") in this subnet, and you force client to get IP address from DHCP server (server name is \"$dhcp_server_name\") ?"
+  echo "4. The DRBL server is able to reverse-map this client IP address to obtain hostname."
+  echo "check http://drbl.org/faq for more details!"
+  echo "***********************************************************"
+  echo "You can enter the shell if you want to debug..."
+  /bin/sh
+fi

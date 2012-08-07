@@ -1,0 +1,29 @@
+#!/bin/bash
+# This program was modified from usplash package (/usr/share/initramfs-tools/hooks/usplash) of Debian by Steven Shiau on 2009/Aug/25
+
+PREREQ=""
+required_cmd=""
+
+prereqs()
+{
+	echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+	prereqs
+	exit 0
+	;;
+esac
+
+[ -x $required_cmd ] || exit 0
+
+# Load functions
+. /usr/lib/mkpxeinitrd-net/mkpxeinitrd-net-func
+
+#mkdir -p ${DESTDIR}/usr/lib/usplash
+
+#copy_exec /sbin/iwconfig /sbin
+
+### NOT FINISHED ###
+# ...

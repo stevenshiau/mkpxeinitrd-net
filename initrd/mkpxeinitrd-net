@@ -1,0 +1,587 @@
+#!/bin/bash
+# initrd builder for network booting
+#
+# Modified by Steven Shiau <steven _at_ nchc org tw> and Blake Huang <klhaung _at_ nchc org tw>.
+#
+# License: GPL
+# Utility function to determine whether or not a filesystem is usable for
+# loopback mounts.  Lifted verbatim from Erik Troan's mkinitrd script.
+# mkpxeinitrd-net program is derived from mkinitrd-net, which is developed by Michael Brown from Fen Systems Ltd.
+
+# Load the config, some variables about drbl might be required in this program. E.g. $drbl_common_root
+DRBL_SCRIPT_PATH="${DRBL_SCRIPT_PATH:-/usr/share/drbl/}"
+. /etc/drbl/drbl.conf
+
+# Load functions
+. /usr/lib/mkpxeinitrd-net/mkpxeinitrd-net-func
+
+# Default settings (some can be overridden by command-line options)
+include_modules=include-modules
+initrd_skel=/usr/lib/mkpxeinitrd-net/initrd-skel
+kernel_ver="$(uname -r)"
+use_sudo=y
+keep=n
+output_dir=/tftpboot/nbi_img
+make_link=y
+quiet=
+vmlinuz_suffix="pxe"
+initrd_suffix="pxe"
+tmpdir="/tmp"
+use_usb_keyboard_modules="yes"
+include_wireless_modules="no"
+# The flag to include all the firmwares in the created initramfs.
+copy_all_firmwares="no"
+include_splash="yes"
+# uncompress the compress kernel module. This is special for Mandriva case. It uses compressed kernel module, e.g. pcnet32.ko.gz. Before we used modprobe from busybox, we have to uncompress that. Now the modprobe program is from the OS (See variable include_bin_prog_from_server), so we should allow this type of kernel modules.
+use_compressed_kernel_module="yes"
+# Some required bin programs to be included in the PXE initrd, which are not provided by busybox or the one provided by busybox does not support the function we want. E.g. sleep (we need "sleep 0.1", while sleep from busybox does not support 0.1 secs).
+include_bin_prog_from_server="sleep lspci insmod modprobe rmmod lsmod pkill strings mount umount mount.nfs umount.nfs"
+
+#
+usage() {
+  echo "Create initial ramdisk images for PXE clients"
+  echo "Usage: $0 [Options]"
+  echo "Options:"
+  echo "-k, --kernel <kernel_ver>:	Specify the kernel version to be used in the initrd of DRBL client"
+  echo "-n, --nolink:	By default the created initrd will be linked as initrd-pxe.img in $output_dir. This option disables that"
+  echo "-q, --quiet	Print less information"
+  echo "-l, --local	The created initrd will be local dir, not in the system dir ($output_dir). This is for debug purpose only."
+  echo "--nosudo 	Do not use sudo when running"
+  echo "-nu, --no-usb-modules 	Do not include USB-related modules in initrd"
+  echo "-v, --verbose	Print out verbose information"
+  echo "-t, --initfs-type ext2|cramfs|initramfs 	Define the format of the created initrd"
+  echo "--keep		Keep temporary files instead of deleting them"
+  echo "-w, --include-wireless-modules 	Include the wireless modules"
+  echo "-nf, --no-all-firmwares 		Not to include all the firmwares, i.e. only the firmwares required by network card drivers will be copied."
+  echo "-if, --include-all-firmwares 	Include all the firmwares"
+  echo "-ns, --no-include-splash		Include the files and modules for splash"
+  echo "-h, --help				Show this messages"
+  echo 
+  echo "Ex:"
+  echo "$0 -k 2.6.32-5-686 -t initramfs -nf"
+}
+
+# No need to use sudo if we are root
+if [ $UID -eq 0 ]; then
+  use_sudo=n
+fi
+
+# Parse command-line options
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -l|--local)
+		shift
+		use_local=y ;;
+    -k|--kernel)
+		shift
+		kernel_ver=$1
+		shift ;;
+    -t|--initfs-type)
+		shift
+		initfs_type=$1
+		shift ;;
+    --nosudo)   shift ; use_sudo=n ;;
+    -nu|--no-usb-modules)  shift ; use_usb_keyboard_modules="no" ;;
+    -w|--include-wireless-modules) shift ; include_wireless_modules="yes" ;;
+    -nf|--no-all-firmwares) shift ; copy_all_firmwares="no" ;;
+    -if|--include-all-firmwares) shift; copy_all_firmwares="yes" ;; 
+    -ns|--no-include-splash) shift ; include_splash="no" ;;
+    --keep)     shift ; keep=y ;;
+    --n|--nolink)
+		shift ; make_link=n ;;
+    -q|--quiet) shift ; quiet=-q ;;
+    -v|--verbose) shift ; verbose="-v" ;;
+    -h|--help)	shift ; do_help=y ;;
+    --)		shift ; break ;;
+    -*)		echo "${0}: ${1}: invalid option" >&2
+		usage
+		exit 2 ;;
+    *)		break ;;
+  esac
+done
+
+
+# Build list of requested modules
+#modules="$*"
+#requested_modules="$modules"
+#modules="$modules lockd" # Need this one..., otherwise, module load procedure will have some problem, ie, we want sunrpc -> lockd -> nfs
+#modules="$modules nfs" # Always require nfs for nfs mount
+#modules="$modules af_packet" # Always require af_packet for udhcpc if it's a module
+
+# --help => Print help message
+if [ "$do_help" == "y" ]; then
+  usage 
+  exit 0;
+fi
+
+# --local => we are running directly from CVS, rather than
+# from an installed copy, so use local files and directories
+if [ "$use_local" == "y" ]; then
+  include_modules=./include-modules
+  initrd_skel=initrd-skel
+  output_dir=tftpboot
+fi
+
+# If use_sudo is set, check that sudo exists
+sudo=/usr/bin/sudo
+if [ "$use_sudo" == "y" ]; then
+  if [ ! -x $sudo ]; then
+    use_sudo=n
+    echo "WARNING: --nosudo not specified but $sudo not found"
+  fi
+fi
+if [ "$use_sudo" == "n" ]; then
+  sudo=
+fi
+
+# Create temporary working files
+initrd="$(mktemp -d ${tmpdir}/initrd.XXXXXX)"
+initrdimg="$(mktemp ${tmpdir}/initrd.img.XXXXXX)"
+initrdmnt="$(mktemp -d ${tmpdir}/initrd.mnt.XXXXXX)"
+
+# Variable DESTDIR is required for copy_exec_not_link use later
+export DESTDIR="$initrd"
+
+# Copy skeleton into temporary area
+cp -a $initrd_skel/* $initrd/
+mkdir -p $initrd/lib/modules/$kernel_ver
+
+# put 2nd search pci table from kernel
+if [ -e "$drbl_common_root/lib/modules/$kernel_ver/modules.pcimap" ]; then
+  cp -f $drbl_common_root/lib/modules/$kernel_ver/modules.pcimap $initrd/etc
+fi
+
+# if we can find the modules in the common_root, use it first
+if [ -d $drbl_common_root/lib/modules/$kernel_ver ]; then
+   drbl_kernel_mod_path="$drbl_common_root/"
+else
+   drbl_kernel_mod_path=""
+fi
+echo "Use kernel modules from $drbl_kernel_mod_path/lib/modules/$kernel_ver."
+
+# check if /boot/config-$kernel_ver exists
+# By Blake Huang, modified by Steven Shiau.
+# kernel config is either in /boot/ or /tftpboot/node_root/boot
+kernel_config="$drbl_kernel_mod_path/lib/modules/../../boot/config-$kernel_ver"
+
+# decided the initfs type
+if [ -n "$initfs_type" ]; then
+  # initfs_type is assigned
+  # format the initfs_type
+  case "$initfs_type" in
+   ext2|EXT2) 
+     if [ -z "$(grep "^CONFIG_EXT2_FS=y" $kernel_config)" ]; then
+       [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
+       echo "EXT2 is NOT builtin (maybe module) in the kernel $kernel_ver (Check $kernel_config for more details)!"
+       [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+       echo "Program terminated!!!"
+       exit 1
+     fi
+     initfs_type="EXT2" ;;
+   cramfs|CRAMFS) 
+     if [ -z "$(grep "^CONFIG_CRAMFS=y" $kernel_config)" ]; then
+       [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
+       echo "CRAMFS is NOT builtin (maybe module) in the kernel $kernel_ver (Check $kernel_config for more details)!"
+       [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+       echo "Program terminated!!!"
+       exit 1
+     fi
+     initfs_type="CRAMFS" ;;
+   initramfs|INITRAMFS) 
+     if [ -z "$(echo "$kernel_ver" | grep -E "(^2\.6\.|^3\.)")" ]; then
+       [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
+       echo "initramfs only works for kernel 2.6 or 3!"
+       [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+       echo "Program terminated!!!"
+       exit 1
+     fi
+     initfs_type="INITRAMFS" ;;
+   *) usage
+      exit 2;;
+  esac
+else
+  # initfs_type is not assigned, try to find it
+  if [ ! -f $kernel_config ]; then 
+    [ "$BOOTUP" = "color" ] && $SETCOLOR_WARNING
+    echo "$kernel_config does NOT exist!"
+    echo "I can not judge either filesystem CRAMFS or EXT2 is builtin (NOT module) in the kernel you are using!!!"
+    echo "We will assume that the kernel you are using can use initramfs!"
+    [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+    if [ -z "$(echo "$kernel_ver" | grep -E "(^2\.6\.|^3\.)")" ]; then
+      [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
+      echo "initramfs only works for kernel 2.6 or 3!"
+      [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+      echo "Program terminated!!!"
+      exit 1
+    fi
+    initfs_type="INITRAMFS"
+  else
+    # we assume the the priority is higher for EXT2, i.e. EXT2 option will overwrite the CRAMFS.
+    [ -n "$(grep "^CONFIG_CRAMFS=y" $kernel_config)" ] && initfs_type="CRAMFS"
+    [ -n "$(grep "^CONFIG_EXT2_FS=y" $kernel_config)" ] && initfs_type="EXT2"
+    if [ -z "$initfs_type" ]; then
+      if [ -z "$(echo "$kernel_ver" | grep -E "(^2\.6\.|^3\.)")" ]; then
+        [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
+        echo "initramfs only works for kernel 2.6 or 3!"
+        [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+        echo "Program terminated!!!"
+        exit 1
+      fi
+      [ "$BOOTUP" = "color" ] && $SETCOLOR_WARNING
+      echo "$kernel_config is found but either CRAMFS or EXT2 filesystem is NOT builtin in the kernel. We will use initramfs."
+      [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+      initfs_type="INITRAMFS"
+    fi
+  fi
+fi
+
+# copy the modules for the requested kernel version like:
+# cp -a /lib/modules/$kernel_ver $initrd/lib/modules/
+# or
+# cp --parents -f -a /lib/modules/$kernel_ver/modules.* /lib/modules/$kernel_ver/kernel/fs/nfs /lib/modules/$kernel_ver/kernel/fs/lockd /lib/modules/$kernel_ver/kernel/drivers/net $initrd/
+# mkpxeinitrd-net result in redhat.
+# nfs.o sunrpc.o lockd.o
+# mkinitrd-net said we need
+# lockd nfs af_packet
+# mandrake etherboot nbi includes
+# af_packet.o  nfsd.o
+# like:
+# /lib/modules/2.4.22-10mdk/kernel/fs/nfsd/nfsd.o.gz
+# /lib/modules/2.4.22-10mdk/kernel/net/packet/af_packet.o.gz
+# it seems that RH do not have af_packet, while Mandrake/Debian has it.
+# so in redhat, we need:
+# nfs.o sunrpc.o lockd.o
+# for mandrake, we need
+# af_packet.o  nfsd.o
+
+# But we can have a better method:
+# In kernel 2.4.26 or later, we need the lib/mldules/$kernel_ver/kernel/lib also
+if [ -n "$(echo $kernel_ver | grep "^2\.4\.")" ]; then
+  # for kernel 2.4.x, we use this ugly method, since tar has "--exclude" option
+  # And we just exclude wireless, ignore the option include_wireless_modules
+  (cd $drbl_kernel_mod_path/lib/modules/$kernel_ver && tar cplf - modules.*  kernel/net/sunrpc* kernel/fs/nfs* kernel/fs/lockd* kernel/net/packet kernel/drivers/net kernel/drivers/base kernel/lib --exclude appletalk --exclude fc --exclude hamradio --exclude irda --exclude pcmcia --exclude tokenring --exclude wan --exclude wireless --exclude wireless_old 2>/dev/null) | ( cd $initrd/lib/modules/$kernel_ver && tar xpf -)
+elif [ -n "$(echo $kernel_ver | grep -E "(^2\.6\.|^3\.)")" ]; then
+  # for kernel 2.6.x, we have better method	 
+  (
+   cd $drbl_kernel_mod_path/lib/modules/$kernel_ver/
+   # We need some usb modules so that we can use usb keyboard if it hang in initrd
+   if [ "$use_usb_keyboard_modules" = "yes" ]; then
+     # No more use static path, since different kernels might use different paths. Use find instead.
+     # usb_related_modules="kernel/drivers/usb/core/usbcore.* \
+     #                     kernel/drivers/usb/host/ehci-hcd.* \
+     #                     kernel/drivers/usb/host/ohci-hcd.* \
+     #                     kernel/drivers/usb/host/uhci-hcd.* \
+     #                     kernel/drivers/usb/input/usbhid.* \
+     #                     kernel/drivers/usb/input/usbkbd.* \
+     #                     kernel/drivers/usb/input/ff-memless.* \
+     #                     kernel/drivers/hid/*"
+     usb_related_modules_files="usbcore ehci-hcd ohci-hcd uhci-hcd usbhid usbkbd ff-memless"
+     usb_related_modules_dirs="hid"
+     usb_related_modules=""
+     # First we find the type like: usbcore.*
+     for i in $usb_related_modules_files; do
+       usb_related_modules="$usb_related_modules $(LC_ALL=C find ./ -name "${i}.*" -print)"
+     done
+     # Second we find the type is a dir, like: kernel/drivers/hid/*
+     for i in $usb_related_modules_dirs; do
+       usb_related_modules="$usb_related_modules $(LC_ALL=C find ./ -type d -name "${i}" -print)"
+     done
+   fi
+   # (a). For modules.*, kernel/net/packet/af_packet (for debian based, RH already builtin) and USB related modules
+   # Always require af_packet for udhcpc if af_packet is not builtin.
+   # Normally, for RedHat-like, it's builtin. For Debian-like, it's a module.
+   net_packet=""
+   [ -d "kernel/net/packet" ] && net_packet="kernel/net/packet"
+   cp -a --parents modules.* $net_packet $usb_related_modules $initrd/lib/modules/$kernel_ver/
+
+   # (b). For nfs.ko modules
+   # From kernel 2.6.17 to 2.6.18 in FC5.92 to FC6, cacaefs is used. Hence
+   # modprobe --show-depends nfs
+   # install /sbin/modprobe --first-time --ignore-install sunrpc && { /bin/mount -t rpc_pipefs sunrpc /var/lib/nfs/rpc_pipefs > /dev/null 2>&1 || :; }
+   # insmod /lib/modules/2.6.17-1.2630.fc6/kernel/fs/nfs_common/nfs_acl.ko
+   # insmod /lib/modules/2.6.17-1.2630.fc6/kernel/fs/fscache/fscache.ko
+   # insmod /lib/modules/2.6.17-1.2630.fc6/kernel/fs/lockd/lockd.ko
+   # insmod /lib/modules/2.6.17-1.2630.fc6/kernel/fs/nfs/nfs.ko
+   nfs_mods="$(parse-nfs-mod -p "$drbl_kernel_mod_path" -k $kernel_ver)"
+   cp -a --parents $nfs_mods $initrd/lib/modules/$kernel_ver/
+
+   # (c). For network device modules
+   # Get the relative path of those NIC kernel modules
+   # Ex: kernel/drivers/net/8139too.ko
+   if [ "$include_wireless_modules" = "yes" ]; then
+     wireless_mod_option="-w"
+   else
+     wireless_mod_option=""
+   fi
+   net_mods="$(parse-net-mod $wireless_mod_option -p "$drbl_kernel_mod_path" -k $kernel_ver)"
+   # To avoid net_mods is too long, we use for loop here
+   for i in $net_mods; do
+     cp -a --parents $i $initrd/lib/modules/$kernel_ver/
+   done
+
+   # Deal with firmwares!
+   # The following is borrowed from Debian's /usr/share/initramfs-tools/hook-functions
+   if [ "$copy_all_firmwares" = "yes" ]; then
+     # In this case, this flag is on, since we need to call /usr/lib/mkpxeinitrd-net/hooks/udev later.
+     firmware_found_flag="yes"  
+     # We want to include all the firmwares. This is useful when "modprobe -F firmware" shows nothing but actually some kernel modules (e.g. ipw2100 on Ubuntu 9.04) need firmware in /lib/firmware.
+     if [ -n "$(unalias ls &>/dev/null; ls $drbl_kernel_mod_path/lib/firmware/* 2>/dev/null)" ]; then
+       mkdir -p ${initrd}/lib/firmware
+       # Since there might be many different kernel version of firmware in $drbl_kernel_mod_path/lib/firmware/, e.g.
+       # lib/firmware/2.6.31-19-generic
+       # lib/firmware/2.6.31-20-generic
+       # Here we only want to include the specific kernel version of firmware
+       rsync --exclude=2.6.* --exclude=3.* -a $drbl_kernel_mod_path/lib/firmware/* ${initrd}/lib/firmware/
+       if [ -d "$drbl_kernel_mod_path/lib/firmware/$kernel_ver" ]; then
+         rsync -a $drbl_kernel_mod_path/lib/firmware/$kernel_ver ${initrd}/lib/firmware/
+       fi
+     fi
+   else
+     # We only include the firmwares reported by "modprobe -F firmware"
+     firmware_found_flag="no"
+     echo "Trying to include network card firmwares if they exist in $drbl_kernel_mod_path/lib/firmware/..."
+     for i in $net_mods; do
+       mod="$initrd/lib/modules/$kernel_ver/$i"
+       firmwares="$(LC_ALL=C modinfo -F firmware ${mod} | sort | uniq 2>/dev/null)"
+       # firmwares e.g.:
+       #   bnx2/bnx2-rv2p-09-4.6.15.fw
+       #   bnx2/bnx2-mips-09-4.6.17.fw
+       #   bnx2/bnx2-rv2p-06-4.6.16.fw
+       #   bnx2/bnx2-mips-06-4.6.16.fw
+       #   e100/d102e_ucode.bin
+       #   e100/d101s_ucode.bin
+       #   e100/d101m_ucode.bin
+       [ -z "$firmwares" ] && continue
+       firmware_found_flag="yes"
+       for firmware in $firmwares; do
+         #if [ -e "${initrd}/lib/firmware/${firmware}" ] \
+         #|| [ -e "${initrd}/lib/firmware/${kernel_ver}/${firmware}" ]; then
+	 #  # firmware exists in the target (initrd) dir. Skip.
+         #  continue
+         #fi
+         
+         # Only print warning for missing fw of loaded module
+         # or forced loaded module
+         if [ ! -e "$drbl_kernel_mod_path/lib/firmware/${firmware}" ] \
+         && [ ! -e "$drbl_kernel_mod_path/lib/firmware/${kernel_ver}/${firmware}" ]; then
+          [ "$verbose" = "-v" ] && echo "W: Possible missing firmware $drbl_kernel_mod_path/lib/firmware/${firmware} for module $(basename ${mod} .ko)" >&2
+         	continue
+         fi
+         
+         [ "$verbose" = "-v" ] && echo "Adding firmware ${firmware}"
+         # The "$firmware" might contain path, e.g.
+         # "ql2500_fw.bin"
+         # "bnx2/bnx2-mips-06-5.0.0.j3.fw"
+         # "2.6.38-8-generic/bnx2/bnx2-rv2p-06-6.0.15.fw"
+	 # //NOTE// firmware might exist in both dir /lib/firmware and lib/firmware/$kernel_ver.
+         if [ -e "$drbl_kernel_mod_path/lib/firmware/${kernel_ver}/${firmware}" ]; then
+          dirnm="$(LC_ALL=C dirname $firmware)"
+          mkdir -p ${initrd}/lib/firmware/${kernel_ver}/$dirnm
+          rsync -a $drbl_kernel_mod_path/lib/firmware/${kernel_ver}/${firmware} ${initrd}/lib/firmware/${kernel_ver}/$dirnm
+         fi
+         if [ -e "$drbl_kernel_mod_path/lib/firmware/${firmware}" ]; then
+          dirnm="$(LC_ALL=C dirname $firmware)"
+          mkdir -p ${initrd}/lib/firmware/$dirnm
+          rsync -a $drbl_kernel_mod_path/lib/firmware/${firmware} ${initrd}/lib/firmware/$dirnm
+         fi
+       done
+     done
+   fi
+
+   # (d). For Ubuntu 7.10 or later.
+   # Extra network drivers are located in dir like: /lib/modules/2.6.22-14-generic/ubuntu/net
+   if [ -n "$(unalias ls &>/dev/null; ls ubuntu/net 2>/dev/null)" ]; then
+     mkdir -p $initrd/lib/modules/$kernel_ver/ubuntu/
+     # Note! Now the working dir is in:
+     # $drbl_kernel_mod_path/lib/modules/$kernel_ver/
+     cp -a --parents ubuntu/net $initrd/lib/modules/$kernel_ver/
+   fi
+   # For Ubuntu 9.04. Ugly here... we list them one by one since some of them might be included in the vanilla kernel in the newer kernel
+   # E.g. the kernel module exists in /lib/modules/2.6.28-17-generic/kernel/ubuntu/atl1c/atl1c.ko
+   # Note! Now the working dir is in:
+   # $drbl_kernel_mod_path/lib/modules/$kernel_ver/
+   ubuntu_extra_net_modules="atl1c e1000e-next et131x"
+   for i in $ubuntu_extra_net_modules; do
+     if [ -d "kernel/ubuntu/$i" ]; then
+       mkdir -p $initrd/lib/modules/$kernel_ver/kernel/ubuntu
+       cp -a --parents kernel/ubuntu/$i $initrd/lib/modules/$kernel_ver/
+     fi
+   done
+   # (e). For Debian Lenny or later
+   # Extra network drivers are located in dir like: /lib/modules/kernel/2.6.26-1-686/extra/atl2/atl2.ko
+   # Since we can not tell which driver is for network or not, we put them all.
+   if [ -n "$(unalias ls &>/dev/null; ls extra/* 2>/dev/null)" ]; then
+     mkdir -p $initrd/lib/modules/$kernel_ver/extra/
+     # Note! Now the working dir is in:
+     # $drbl_kernel_mod_path/lib/modules/$kernel_ver/
+     cp -a --parents extra/* $initrd/lib/modules/$kernel_ver/extra/
+   fi
+
+   # If firmware_found_flag is "yes", we have to include udev, since without udev, firmware loading won't work.
+   if [ "$firmware_found_flag" = "yes" ]; then
+     mkdir -p $initrd/lib/udev
+     # The files could be /lib/udev/firmware.agent, /lib/udev/firmware.sh or /lib/udev/firmware (ubuntu 10.04)
+     for i in /lib/udev/*firmware*; do
+       [ ! -e "$i" ] && continue
+       copy_exec_not_link $i
+     done
+     # More files will be copied in /usr/lib/mkpxeinitrd-net/hooks/udev later
+     # The copy_exec_not_link in hooks/udev will honor variable DESTDIR
+     echo "Calling hook udev..."
+     /usr/lib/mkpxeinitrd-net/hooks/udev
+   fi
+  )
+else 
+  echo "Kernel $kernel_ver is not supported! Program terminated!"
+  exit 1
+fi
+
+# splash
+if [ "$include_splash" = "yes" -a -e /sbin/usplash -a -e /sbin/usplash_write ]; then
+  mkdir -p ${DESTDIR}/usr/lib/usplash
+  
+  copy_exec_not_link /sbin/usplash /sbin
+  copy_exec_not_link /sbin/usplash_write /sbin
+  if [ -f /etc/usplash.conf ]; then
+  	copy_exec_not_link /etc/usplash.conf /etc
+  fi
+  
+  if [ -f /usr/lib/usplash/usplash-artwork.so ]; then
+      copy_exec_not_link /usr/lib/usplash/usplash-artwork.so /usr/lib/usplash
+  fi
+fi
+
+# Some required files for mount.nfs
+  # /etc/netconfig does not exist on CentOS 5.
+  mount_required_etc="services protocols netconfig"
+  for i in $mount_required_etc; do
+    [ ! -e /etc/$i ] && continue
+    copy_exec_not_link /etc/$i /etc/
+  done
+# /lib/libnss_file* are required for mount.nfs, which ldd won't show
+  # Since libnss_files could be in /lib/, /lib/i386-linux-gnu (Debian), /lib64/ (Fedora)... We search them.
+  LIBNSS_FILES_DIR="/lib/"
+  [ -d "/lib64" ] && LIBNSS_FILES_DIR="$LIBNSS_FILES_DIR /lib64/"
+  LIBNSS_FILES="$(LC_ALL=C find $LIBNSS_FILES_DIR -name "libnss_files*" -print)"
+  for i in $LIBNSS_FILES; do
+    DIRNM="$(dirname $i)"
+    mkdir -p $DESTDIR/$DIRNM
+    copy_exec_not_link $i $DIRNM
+  done
+# Some required bin programs, which are not provided by busybox. E.g. ethtool
+for i in $include_bin_prog_from_server; do
+  [ "$verbose" = "-v" ] && echo "Finding program $i on the server..."
+  if which $i &>/dev/null; then
+    [ "$verbose" = "-v" ] && echo "Including $i in the PXE initrd..."
+    copy_exec_not_link $(which $i) /bin/
+    # Make sure the owner is root, otherwise the error "mount: only root can do that (effective UID is xxxxxx)" might occur.
+    chown root.root $DESTDIR/bin/$i
+  fi
+done
+
+if [ "$use_compressed_kernel_module" = "no" ]; then
+  # before gzipping the initrd, rename or unzip the gzipped modules if they exist,
+  # so that modprobe from busybox can use that. This is specially for Mandrake
+  # for kernel 2.6, the modules is *.ko.gz, while for kernel 2.4, it's *.o.gz
+  find $initrd/lib/modules/$kernel_ver/ -name "*.o.gz" -exec gunzip {} \;
+  find $initrd/lib/modules/$kernel_ver/ -name "*.ko.gz" -exec gunzip {} \;
+  
+  # rename the module names in modules.dep from *.o.gz to *.o, 
+  # This is specially for Mandrake
+  perl -pi -e 's/(.[k]*o).gz/$1/g' $initrd/lib/modules/$kernel_ver/modules.dep
+fi
+
+# copy the kernel to output_dir first.
+cp -f $verbose $drbl_kernel_mod_path/boot/vmlinuz-$kernel_ver $output_dir/
+# Force to set the mode to be 644, so it can be read by clients. Otherwise on some system (e.g. Ubuntu 11.04, the /boot/vmlinuz is mode=600).
+chmod 644 $output_dir/vmlinuz-$kernel_ver
+# To create initrd with CRAMFS or EXT2
+case "$initfs_type" in
+ "CRAMFS")
+   # CRAMFS
+   echo "Creating the CRAMFS initrd..."
+   $sudo mknod $initrd/dev/console c 5 1
+   $sudo mknod $initrd/dev/null c 1 3
+   $sudo mknod $initrd/dev/ram b 1 1
+   $sudo mknod $initrd/dev/systty c 4 0
+   $sudo mknod $initrd/dev/random c 1 8
+   $sudo mknod $initrd/dev/urandom c 1 9
+   for i in 1 2 3 4; do $sudo mknod $initrd/dev/tty$i c 4 $i; done
+   
+   # initrd image looks for /linuxrc instead of /init
+   mv -f $initrd/linuxrc-or-init $initrd/linuxrc
+   # create initrd using cramfs
+   mkcramfs $initrd $output_dir/initrd-$initrd_suffix.$kernel_ver.img
+   [ "$verbose" = "-v" ] && echo "The output initrd is $output_dir/initrd-$initrd_suffix.$kernel_ver.img" 
+   ;;
+ "EXT2")
+   # EXT2
+   # Create empty ext2fs image file
+   echo "Creating the EXT2 initrd..."
+   dd if=/dev/zero bs=1k of=$initrdimg count=$((`du -sk $initrd | cut -f1` * 7 / 6)) 2> /dev/null
+   /sbin/mke2fs -q -F $initrdimg 2> /dev/null
+   
+   # Mount image file, copy files on, create /dev entries, display free space, umount
+   $sudo mount -o loop $initrdimg $initrdmnt
+   cp -a $initrd/* $initrdmnt/
+   # initrd image looks for /linuxrc instead of /init
+   mv -f $initrdmnt/linuxrc-or-init $initrdmnt/linuxrc
+   $sudo mknod $initrdmnt/dev/console c 5 1
+   $sudo mknod $initrdmnt/dev/null c 1 3
+   $sudo mknod $initrdmnt/dev/ram b 1 1
+   $sudo mknod $initrdmnt/dev/systty c 4 0
+   $sudo mknod $initrdmnt/dev/random c 1 8
+   $sudo mknod $initrdmnt/dev/urandom c 1 9
+   for i in 1 2 3 4; do $sudo mknod $initrdmnt/dev/tty$i c 4 $i; done
+
+   if [ "$quiet" == "n" ]; then
+     df -h $initrdmnt
+   fi
+   $sudo umount $initrdmnt
+   
+   # Create output file
+   gzip -9 -n -c $initrdimg > $output_dir/initrd-$initrd_suffix.$kernel_ver.img
+   [ "$verbose" = "-v" ] && echo "The output initrd is $output_dir/initrd-$initrd_suffix-$kernel_ver.img" 
+   ;;
+ "INITRAMFS")
+   # initramfs
+   echo "Creating the initRAMFS image..."
+   $sudo mknod $initrd/dev/console c 5 1
+   $sudo mknod $initrd/dev/null c 1 3
+   $sudo mknod $initrd/dev/ram b 1 1
+   $sudo mknod $initrd/dev/systty c 4 0
+   $sudo mknod $initrd/dev/random c 1 8
+   $sudo mknod $initrd/dev/urandom c 1 9
+   for i in 1 2 3 4; do $sudo mknod $initrd/dev/tty$i c 4 $i; done
+
+   # create initrd using initramfs
+   ( cd $initrd
+     # initRAMFS image looks for /init instead of /linuxrc
+     mv -f linuxrc-or-init init
+     find . | cpio --quiet -o -H newc | gzip -9 > $output_dir/initrd-$initrd_suffix.$kernel_ver.img )
+   [ "$verbose" = "-v" ] && echo "The output initrd is $output_dir/initrd-$initrd_suffix.$kernel_ver.img" 
+   ;;
+esac
+# Force to set the mode to be 644, so it can be read by clients.
+chmod 644 $output_dir/initrd-$initrd_suffix.$kernel_ver.img
+# Create symlink
+if [ "$make_link" == "y" ]; then
+  [ "$verbose" = "-v" ] && echo "Creating the softlink vmlinuz and initrd..."
+  # vmlinuz
+  vmlinuz_link=$output_dir/vmlinuz-$vmlinuz_suffix
+  [ -L $vmlinuz_link ] && rm -f $verbose $vmlinuz_link
+  ln -fs $verbose vmlinuz-$kernel_ver $vmlinuz_link
+  #initrd
+  initrd_link=$output_dir/initrd-$initrd_suffix.img
+  [ -L $initrd_link ] && rm -f $verbose $initrd_link
+  ln -fs $verbose initrd-$initrd_suffix.$kernel_ver.img $initrd_link
+fi
+
+# Remove temporary files
+if [ "$keep" == "n" ]; then
+  rm -rf $initrd
+  rm -f $initrdimg
+  rmdir $initrdmnt
+fi
+
+exit 0

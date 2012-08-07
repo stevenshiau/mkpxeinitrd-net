@@ -1,0 +1,22 @@
+# /etc/modules: network device kernel modules to load at boot time.
+#
+# This file should contain the names of network device kernel modules that are
+# to be loaded at boot time, one per line.  Comments begin with
+# a "#", and everything on the line after them are ignored.
+# Note! Only network device modules are available in DRBL network initrd.
+#
+
+# bcm5700
+# This is for usb keyboard
+usbcore
+ehci-hcd
+ohci-hcd
+uhci-hcd
+usbhid
+usbkbd
+
+# These maybe for usb keyboard in kernel 2.4
+keybdev
+mousedev
+input
+usbmouse

@@ -1,0 +1,86 @@
+#!/bin/bash
+# Steven Shiau <steven _at_ nchc org tw>
+# License: GPL
+# Description: To parse the /lib/modules/$KERNEL to get the modules for network
+# Usage: $0 KERNEL_VERSION
+# Ex: $0 2.6.8.1-25mdk
+
+# default setting
+include_wireless_modules="no"
+
+#
+usage() {
+ echo Usage: $0 [OPTION] KERNEL_VERSION
+ echo "OPTION:"
+ echo " -p|--prefix PATH       Add the prefix PATH so it will use the modules.deps  in PATH/lib/modules/."
+ echo " -k|--kernel-ver KVER   Use kernel version KVER for DRBL client."
+ echo " -w|--include-wireless-modules  Include the kernel wireless modules in the list."
+ echo " -h|--help              Show the usage info."
+ echo "Ex: $0 -k 2.6.26-2-686"
+ echo "Note! This program only works for kernel version >= 2.6"
+}
+
+#
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -p|--prefix)
+            shift; 
+            # skip the -xx option, in case 
+            [ -z "$(echo $1 |grep ^-.)" ] && PREFIX="$1"
+            shift;;
+    -k|--kernel-ver)
+            shift; 
+            # skip the -xx option, in case 
+            [ -z "$(echo $1 |grep ^-.)" ] && kver="$1"
+            shift;;
+    -w|--include-wireless-modules) shift ; include_wireless_modules="yes" ;;
+    -h|--help)
+	    usage >& 2
+	    shift;;
+    -*)	    echo "${0}: ${1}: invalid option" >&2
+	    usage >& 2
+	    exit 2 ;;
+    *)	    break ;;
+  esac
+done
+
+[ -z "$kver" ] && exit 1
+# For Ubuntu Jaunty, kernel 2.6.28-11, the modules.dep is like:
+# kernel/fs/nfs/nfs.ko: kernel/fs/lockd/lockd.ko kernel/fs/nfs_common/nfs_acl.ko kernel/net/sunrpc/sunrpc.ko
+# For older Linux distributions, the modules.dep is like:
+# /lib/modules/2.6.26-1-686/kernel/fs/nfs/nfs.ko: /lib/modules/2.6.26-1-686/kernel/fs/lockd/lockd.ko /lib/modules/2.6.26-1-686/kernel/fs/nfs_common/nfs_acl.ko /lib/modules/2.6.26-1-686/kernel/net/sunrpc/sunrpc.ko
+# Therefore we have to judge from $PREFIX/lib/modules/$kver/modules.dep. We do not have to check all the content of modules.dep, just the first few lines will be enough. (just in case, here we choose 10 lines)
+if [ -z "$(head -n 10 $PREFIX/lib/modules/$kver/modules.dep | grep -E "^/lib/modules/")" ]; then
+  # New style, like kernel/drivers/net/e100.ko
+  net_mod_path="kernel/drivers/net"
+else
+  # Old style, like /lib/modules/2.6.26-1-686/kernel/drivers/net/e100.ko
+  net_mod_path="/lib/modules/$kver/kernel/drivers/net"
+fi
+
+# Regure expression to grep the nfs.ko
+net_mod_reg="^$net_mod_path/.*\.ko(\.gz)*:"
+
+exclude_list="appletalk fc hamradio irda pcmcia tokenring wan irda"
+if [ "$include_wireless_modules" = "no" ]; then
+  exclude_list="$exclude_list wireless wireless_old"
+fi
+
+for ie in $exclude_list; do
+  exclude_opt="$exclude_opt|$net_mod_path/$ie"
+done
+exclude_opt="$(echo $exclude_opt | sed -e "s/^|//g")"
+
+# skip those duplicate modules, and we need to strip the leading "/" so that
+# we get the path is relative path like:
+# kernel/drivers/net/8139too.ko
+# Then it's easier for us to copy them.
+# Note!!! sed -e "s|^/lib/modules/$kver/||", the / after $kver is very important
+# Do ***NOT*** remove that!
+(
+  # get the network card modules
+  grep -E "$net_mod_reg" $PREFIX/lib/modules/$kver/modules.dep | grep -vE "($exclude_opt)" | awk -F":" '{print $1}' 
+
+  # get those depended modules
+  grep -E "$net_mod_reg" $PREFIX/lib/modules/$kver/modules.dep | grep -vE "($exclude_opt)" | awk -F":" '{print $2}' | awk -F' ' '{for (i = 1; i <= NF; i = i + 1) print $i}'
+) | sort | uniq | sed -e "s|^/lib/modules/$kver/||"
