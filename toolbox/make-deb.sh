@@ -29,7 +29,16 @@ rm -rf debforge/*
 mkdir -p debforge/
 (cd debforge; ln -fs ../$TARBALL $TARBALL_ORIG)
 tar -xvjf $TARBALL -C debforge/
-[ -e "$busybox_pkg" ] && cp $busybox_pkg debforge/$PKG-$VER/initrd/
+# With Debian format 3.0, you can not put binary file in a package unless it's assigned by  debian/source/include-binaries.
+# The error messages:
+# dpkg-source: info: using source format `3.0 (quilt)'
+# dpkg-source: info: building mkpxeinitrd-net using existing ./mkpxeinitrd-net_2.0.2.orig.tar.bz2
+# dpkg-source: error: cannot represent change to initrd/busybox-1.20.2.tar.bz2: binary file contents changed
+# dpkg-source: error: add initrd/busybox-1.20.2.tar.bz2 in debian/source/include-binaries if you want to store the modified binary in the debian tarball
+# dpkg-source: error: unrepresentable changes to source
+# dpkg-buildpackage: error: dpkg-source -b mkpxeinitrd-net-2.0.2 gave error exit status 2
+#
+#[ -e "$busybox_pkg" ] && cp $busybox_pkg debforge/$PKG-$VER/initrd/
 cp -a debian debforge/$PKG-$VER/
 cd debforge/$PKG-$VER
 debuild --no-tgz-check --no-lintian
