@@ -7,6 +7,7 @@ set -e
 PKG="mkpxeinitrd-net"
 RPMBUILD="${HOME}/rpmbuild/"
 SPEC_FILE="$PKG.spec"
+BUSYBOX_URL="http://www.busybox.net/downloads/"
 
 # Source function library.
 #. /etc/rc.d/init.d/functions
@@ -38,7 +39,9 @@ busybox_cfg="busybox-$BUSYBOX_VER.config"
 mkinitrd_net_pkg="$PKG-$VER.tar.bz2"
 
 # check if pkg exists
-[ ! -f "$busybox_pkg" ] && echo "$busybox_pkg NOT exists!!! Program stop!!!" && exit 1
+if [ ! -f "$busybox_pkg" ]; then
+  wget $BUSYBOX_URL/$busybox_pkg
+fi
 
 #
 build_prefix="${HOME}/rpmbuild/"
