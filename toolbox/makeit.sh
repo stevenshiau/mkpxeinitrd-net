@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash -x
 set -e
 rm -rf debforge RPMS.drbl-test
 toolbox/packit.sh
