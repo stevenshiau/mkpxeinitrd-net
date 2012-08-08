@@ -1,13 +1,13 @@
 mkpxeinitrd-net:
 ------
-1. change the mkpxeinitrd-net.spec
+1. Change the mkpxeinitrd-net.spec
 %define BUSYBOX_VERSION 1.1.0
 
-2. initrd/Makefile
+2. Edit the initrd/Makefile, change busybox version
 ex:
 BUSYBOX_VERSION = 1.1.0
 
-3. check initrd/
+3. Check initrd/
 ex:
 initrd/config.busybox/busybox-1.1.0.config
 maybe need to update, by

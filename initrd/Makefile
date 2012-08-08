@@ -29,10 +29,9 @@ utils : $(UTILS)
 clean : partlyclean
 
 partlyclean :
-	rm -rf $(UDHCP)
 	rm -rf $(BUSYBOX)
 	rm -rf initrd-skel
-	rm -f *.img *.ird *.nbi
+	rm -f *.img
 	rm -f $(UTILS)
 
 .PHONY : all utils clean partlyclean
