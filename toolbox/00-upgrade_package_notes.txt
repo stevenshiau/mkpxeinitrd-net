@@ -1,0 +1,55 @@
+mkpxeinitrd-net:
+------
+1. change the mkpxeinitrd-net.spec
+%define BUSYBOX_VERSION 1.1.0
+
+2. initrd/Makefile
+ex:
+BUSYBOX_VERSION = 1.1.0
+
+3. check initrd/
+ex:
+initrd/config.busybox/busybox-1.1.0.config
+maybe need to update, by
+   make menuconfig
+   0. The easiest way is to use the older config file from initrd/config.busybox/, load in the new version, then save as new config file.
+   If manually choose the config:
+   a. Build Options  -> Build BusyBox as a static binary (no shared libs)
+      i.e. make busybox to be compiled as static linking
+
+      PS. busybox 1.7.1 or later:
+      In "make menuconfig", the "Busybox Library Tuning"
+      Use clock_gettime(CLOCK_MONOTONIC) syscall <- uncheck
+      ref: http://www.busybox.net/lists/busybox/2007-September/028823.html
+
+   b. Linux Module Utilities -> 
+      [*] insmod
+           [*]   Module version checking
+           [*]   Add module symbols to kernel symbol table
+	   [*]   In kernel memory optimization (uClinux only)
+	   [ ]   Enable load map (-m) option    
+      [*] modprobe
+      [*] rmmod
+      ---   Options common to multiple modutils
+      [*]   Support tainted module checking with new kernels
+      [*]   Support version 2.2.x to 2.4.x Linux kernels
+      [*]   Support version 2.6.x Linux kernel
+
+      Others:
+      1. Utility programs, e.g. ping, ifconfig...
+      2. Networking Utilities ->  udhcp Server/Client  --->  [*] udhcp Client (udhcpc)
+         Remember to turn on this after busybox 1.10.1:
+	 CONFIG_FEATURE_UDHCP_PORT=y
+
+      3. Init Utilities
+	 [*] init
+	 [*]     Support reading an inittab file?
+	 [*]     Support running init from within an initrd?
+      4. Linux System Utilities ───── 
+         [*] pivot_root   <- ext2fs
+	 [*] switch_root  <- cramfs
+         [*] mount
+         [*]     Support mounting NFS file systems    
+
+4. On i386 Debian system, run toolbox/make-it.sh -> i386 deb and rpm will be created.
+   On amd64 Debian system, run toolbox/pack-it.sh then ./make-deb.sh, amd64 deb will be created.
