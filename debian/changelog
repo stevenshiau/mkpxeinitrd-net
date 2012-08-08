@@ -1,3 +1,10 @@
+mkpxeinitrd-net (2.0.1-drbl1) unstable; urgency=low
+
+  * Depends on drbl.
+  * Program mkpxeinitrd-net will only read /etc/drbl/drbl.conf if it exists. 
+
+ -- Steven Shiau <steven@nchc.org.tw>  Wed, 08 Aug 2012 13:21:43 +0800
+
 mkpxeinitrd-net (2.0.0-drbl1) unstable; urgency=low
 
   * Mkpxeinitrd-net version 2. New files arch so it's easier to be packaged in Debian.

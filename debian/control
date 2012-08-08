@@ -8,7 +8,7 @@ Homepage: http://www.freedos.org/
 
 Package: mkpxeinitrd-net
 Architecture: i386 amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}, coreutils, pciutils, module-init-tools, procps
+Depends: ${shlibs:Depends}, ${misc:Depends}, coreutils, pciutils, module-init-tools, procps, drbl (>= 2.0.0)
 Description: Build initial ramdisk images for DRBL clients.
   mkpxeinitrd-net is a derived program from mkinitrd-net.
   mkpxeinitrd-net allows you to build initial ramdisk images (initrds) suitable for use with PXE and Etherboot (Using PXE compatable mode) network-booting software.  This package contains one main utility: mkpxeinitrd-net (to build an initrd containing a specified set of network-card modules).
