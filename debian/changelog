@@ -1,3 +1,9 @@
+mkpxeinitrd-net (2.0.2-drbll) unstable; urgency=low
+
+  * Source format 3.0 was added in dir debian.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Wed, 08 Aug 2012 14:03:45 +0800
+
 mkpxeinitrd-net (2.0.1-drbl1) unstable; urgency=low
 
   * Depends on drbl.

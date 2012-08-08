@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.0.1
+Version: 2.0.2
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -52,6 +52,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Wed Aug 08 2012 Steven Shiau <steven _at_ nchc org tw> 2.0.2-drbl1
+- Source format 3.0 was added in dir debian.
+
 * Wed Aug 08 2012 Steven Shiau <steven _at_ nchc org tw> 2.0.1-drbl1
 - Depends on drbl.
 - Program mkpxeinitrd-net will only read /etc/drbl/drbl.conf if it exists. 
