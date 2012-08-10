@@ -27,7 +27,7 @@ RVER=$VER-$RELEASE
 #esac
 
 #
-BUSYBOX_VER=`grep "^%define BUSYBOX_VERSION" $SPEC_FILE |sed -e "s/\t/ /g" -e "s/ \+/ /g" |cut  -d" " -f3 |tr -d " "`
+BUSYBOX_VER="$(LC_ALL=C grep -Ew "^BUSYBOX_VERSION = .*" initrd/Makefile | awk -F"=" '{print $2}' | sed -r -e "s/^[[:space:]]*//g")"
 echo "BUSYBOX VER: $BUSYBOX_VER"
 
 #
