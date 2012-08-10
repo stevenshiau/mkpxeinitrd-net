@@ -1,19 +1,17 @@
 #!/bin/bash
 # Steven Shiau <steven _at_ nchc org tw)
+
+# Settings
+PKG="mkpxeinitrd-net"
+
 set -e
 #
-PKG="mkpxeinitrd-net"
-SPEC_FILE="$PKG.spec"
-
-#
-[ ! -f "$SPEC_FILE" ] && echo "Can NOT find spec file $SPEC_FILE" && exit 1
-
-#
-VER=`grep ^Version $SPEC_FILE |sed -e "s/\t/ /g" -e "s/ \+/ /g" |cut  -d":" -f2 |tr -d " "`
+VER="$(LC_ALL=C head -n 1 debian/changelog  | grep -i "^${PKG}" | grep -E -o "\(.*\)" | sed -r -e "s/\(//g" -e "s/\)//g" | cut -d"-" -f1)"
+[ -z "$VER" ] && echo "No version found in debian/changelog! Program terminated!"
 echo "VER: $VER"
 
 #
-BUSYBOX_VER=`grep "^%define BUSYBOX_VERSION" $SPEC_FILE |sed -e "s/\t/ /g" -e "s/ \+/ /g" |cut  -d" " -f3 |tr -d " "`
+BUSYBOX_VER="$(LC_ALL=C grep -Ew "^BUSYBOX_VERSION = .*" initrd/Makefile | awk -F"=" '{print $2}' | sed -r -e "s/^[[:space:]]*//g")"
 echo "BUSYBOX VER: $BUSYBOX_VER"
 
 #
@@ -22,11 +20,11 @@ TARBALL_ORIG=${PKG}_${VER}.orig.tar.bz2
 busybox_pkg="busybox-$BUSYBOX_VER.tar.bz2"
 
 # check
-[ ! -f "$TARBALL" ] && echo "Can NOT find file $TARBALL! Did you forget to update the rdate in file clonezilla.spec ? Program Stop!!!" && exit 1
+[ ! -f "$TARBALL" ] && echo "Can NOT find file $TARBALL! Program Stop!!!" && exit 1
 
 # mkdir for build
-rm -rf debforge/*
-mkdir -p debforge/
+rm -rf debforge
+mkdir debforge
 (cd debforge; ln -fs ../$TARBALL $TARBALL_ORIG)
 tar -xvjf $TARBALL -C debforge/
 # With Debian format 3.0, you can not put binary file in a package unless it's assigned by  debian/source/include-binaries.
