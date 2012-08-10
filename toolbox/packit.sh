@@ -1,27 +1,24 @@
 #!/bin/bash
+# generate the ChangeLog.txt and create the tarball
+
+# Settings
 PKG="mkpxeinitrd-net"
-RPMBUILD="${HOME}/rpmbuild/"
-SPEC_FILE="$PKG.spec"
+FILES_DIRS="initrd"
 
 set -e
 #
-[ ! -f "$SPEC_FILE" ] && echo "Can NOT find spec file $SPEC_FILE" && exit 1
-
-# Create the changelog file
-#
-VER=`grep ^Version $SPEC_FILE |sed -e "s/\t/ /g" -e "s/ \+/ /g" |cut  -d":" -f2 |tr -d " "`
+VER="$(LC_ALL=C head -n 1 debian/changelog  | grep -i "^${PKG}" | grep -E -o "\(.*\)" | sed -r -e "s/\(//g" -e "s/\)//g" | cut -d"-" -f1)"
+[ -z "$VER" ] && echo "No version found in debian/changelog! Program terminated!"
 echo "VER: $VER"
 
-TARBALL="$PKG-$VER.tar.bz2"
-td="$PKG-$VER"
-#check if necessary files exist...
-[ -f $SPEC_FILE ] || exit 0
-[ -f $TARBALL ] && rm -f $TARBALL
+td="${PKG}-${VER}"
+
+#
+[ -d "$td" ] && rm -rf $td
+mkdir -p $td
 # Clean stale files in debian
-rm -rf debian/tmp
-[ -d "$td" ] && rm -rf $td
-mkdir $td
-cp -a initrd $SPEC_FILE $td
-tar -cjf $TARBALL $td --owner=root --group=root 
-[ -d "$td" ] && rm -rf $td
-[ -f $TARBALL ] || exit 0
+cp -ar $FILES_DIRS $td/
+
+#echo $VER > $td/doc/VERSION
+tar cvjf $td.tar.bz2 --owner=root --group=root $td
+rm -rf $td
