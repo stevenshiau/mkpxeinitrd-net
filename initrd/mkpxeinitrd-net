@@ -9,7 +9,7 @@
 # mkpxeinitrd-net program is derived from mkinitrd-net, which is developed by Michael Brown from Fen Systems Ltd.
 
 # Load the config, some variables about drbl might be required in this program. E.g. $drbl_common_root
-DRBL_SCRIPT_PATH="${DRBL_SCRIPT_PATH:-/usr/share/drbl/}"
+DRBL_SCRIPT_PATH="${DRBL_SCRIPT_PATH:-/usr/share/drbl}"
 [ -e /etc/drbl/drbl.conf ] && . /etc/drbl/drbl.conf
 
 # Load functions
