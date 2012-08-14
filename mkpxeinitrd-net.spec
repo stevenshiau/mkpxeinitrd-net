@@ -52,6 +52,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+- Updating debian/control. Wrong home page was corrected.
+
 * Sun Aug 12 2012 Steven Shiau <steven _at_ nchc org tw> 2.0.3-drbl1
 - Using /usr/share/drbl instead of /usr/share/drbl/ so that no "//" in the PATH.
 

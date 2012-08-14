@@ -1,10 +1,16 @@
-mkpxeinitrd-net (2.0.3-drbll) unstable; urgency=low
+mkpxeinitrd-net (2.0.4-drbl1) unstable; urgency=low
+
+  * Updating debian/control. Wrong home page was corrected.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Tue, 14 Aug 2012 11:24:23 +0800
+
+mkpxeinitrd-net (2.0.3-drbl1) unstable; urgency=low
 
   * Using /usr/share/drbl instead of /usr/share/drbl/ so that no "//" in the PATH.
 
  -- Steven Shiau <steven@nchc.org.tw>  Sun, 12 Aug 2012 22:34:02 +0800
 
-mkpxeinitrd-net (2.0.2-drbll) unstable; urgency=low
+mkpxeinitrd-net (2.0.2-drbl1) unstable; urgency=low
 
   * Source format 3.0 was added in dir debian.
 
