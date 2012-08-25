@@ -145,6 +145,7 @@ export DESTDIR="$initrd"
 # Copy skeleton into temporary area
 cp -a $initrd_skel/* $initrd/
 mkdir -p $initrd/lib/modules/$kernel_ver
+mkdir -p $initrd/dev/
 
 # put 2nd search pci table from kernel
 if [ -e "$drbl_common_root/lib/modules/$kernel_ver/modules.pcimap" ]; then

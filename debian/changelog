@@ -1,3 +1,9 @@
+mkpxeinitrd-net (2.0.5-drbl1) unstable; urgency=low
+
+  * Bug fixed: $initrd/dev should be created before node files are made.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Sat, 25 Aug 2012 21:38:06 +0800
+
 mkpxeinitrd-net (2.0.4-drbl1) unstable; urgency=low
 
   * Updating debian/control. Wrong home page was corrected.

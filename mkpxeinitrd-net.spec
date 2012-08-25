@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.0.4
+Version: 2.0.5
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -52,6 +52,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Sat Aug 25 2012 Steven Shiau <steven _at_ nchc org tw> 2.0.5-drbl1
+- Bug fixed: $initrd/dev should be created before node files are made.
+
 * Sat Aug 25 2012 Steven Shiau <steven _at_ nchc org tw> 2.0.4-drbl1
 - Do not create the empty dir /proc and /dev in Makefile.
 - Updating debian/control. Wrong home page was corrected.
