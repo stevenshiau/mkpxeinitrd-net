@@ -49,13 +49,8 @@ $(BUSYBOX) : $(BUSYBOX).tar.bz2
 initrd-skel : $(UTILS) linuxrc-or-init udhcpc-post
 	rm -rf $@
 	mkdir -p $@
-	mkdir -p $@/dev
 	mkdir -p $@/etc
 	mkdir -p $@/bin
-	mkdir -p $@/lib
-	mkdir -p $@/lib/modules
-	mkdir -p $@/proc
-	mkdir -p $@/sysroot
 	ln -s bin $@/sbin
 	install -m 755 busybox scan_pci ls_pciid.sh get-nic-devs insert-modules $@/bin/
 	install -m 644 pcitable pci.ids linuxrc.conf netdev.conf modules $@/etc/
@@ -116,6 +111,7 @@ hooksdir = $(libdir)/mkpxeinitrd-net/hooks
 
 install :
 	mkdir -p $(bindir)
+	mkdir -p $(docdir)
 	mkdir -p $(sysconfdir)
 	mkdir -p $(initrdskeldir)
 	mkdir -p $(hooksdir)

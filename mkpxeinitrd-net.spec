@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.0.3
+Version: 2.0.4
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -12,7 +12,7 @@ Group: System/Kernel and hardware
 URL: http://www.fensystems.co.uk/SRPMS.fensys
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
-Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.0.6
+Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.0.14
 Obsoletes: mkinitrd-net
 ExclusiveArch: %{ix86}, x86_64
 
@@ -52,7 +52,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Sat Aug 25 2012 Steven Shiau <steven _at_ nchc org tw> 2.0.4-drbl1
+- Do not create the empty dir /proc and /dev in Makefile.
 - Updating debian/control. Wrong home page was corrected.
+- File debian/watch was added.
 
 * Sun Aug 12 2012 Steven Shiau <steven _at_ nchc org tw> 2.0.3-drbl1
 - Using /usr/share/drbl instead of /usr/share/drbl/ so that no "//" in the PATH.

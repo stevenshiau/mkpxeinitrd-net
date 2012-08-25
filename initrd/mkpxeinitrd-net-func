@@ -1,3 +1,4 @@
+#!/bin/bash
 # -*-Shell-script-*-
 # Function copy_exec_not_link is borrowed from copy_exec from Debian's package initramfs-tools: /usr/share/initramfs-tools/hook-functions. The difference is that we use "cp -pL" instead of "ln -fs" in this function. This is because when we run mkpxeinitrd-net, we run cpio without "--dereference" (mkinitramfs uses cpio with "--dereference"), i.e. in mkpxeinitrd-net, we use:
  # find . | cpio --quiet -o -H newc | gzip -9 > $output_dir/initrd-$initrd_suffix.$kernel_ver.img )

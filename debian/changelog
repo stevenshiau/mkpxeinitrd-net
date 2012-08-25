@@ -1,8 +1,9 @@
 mkpxeinitrd-net (2.0.4-drbl1) unstable; urgency=low
 
   * Updating debian/control. Wrong home page was corrected.
+  * File debian/watch was added.
 
- -- Steven Shiau <steven@nchc.org.tw>  Tue, 14 Aug 2012 11:24:23 +0800
+ -- Steven Shiau <steven@nchc.org.tw>  Sat, 25 Aug 2012 08:39:34 +0800
 
 mkpxeinitrd-net (2.0.3-drbl1) unstable; urgency=low
 

@@ -1,0 +1,1 @@
+mkpxeinitrd-net: statically-linked-binary usr/lib/mkpxeinitrd-net/initrd-skel/bin/busybox

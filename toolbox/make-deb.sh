@@ -39,5 +39,5 @@ tar -xvjf $TARBALL -C debforge/
 #[ -e "$busybox_pkg" ] && cp $busybox_pkg debforge/$PKG-$VER/initrd/
 cp -a debian debforge/$PKG-$VER/
 cd debforge/$PKG-$VER
-debuild --no-tgz-check --no-lintian
+debuild -j8
 rm -f $TARBALL_ORIG

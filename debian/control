@@ -1,15 +1,19 @@
 Source: mkpxeinitrd-net
-Section: misc
-Priority: optional
+Section: admin
+Priority: extra
 Maintainer: Steven Shiau <steven@nchc.org.tw>
-Build-Depends: debhelper (>= 5)
-Standards-Version: 3.8.0
+Uploaders: Georges Khaznadar <georgesk@ofset.org>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.3
 Homepage: http://drbl.org/
 
 Package: mkpxeinitrd-net
 Architecture: i386 amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}, coreutils, pciutils, module-init-tools, procps, drbl (>= 2.0.0)
-Description: Build initial ramdisk images for DRBL clients.
-  mkpxeinitrd-net is a derived program from mkinitrd-net.
-  mkpxeinitrd-net allows you to build initial ramdisk images (initrds) suitable for use with PXE and Etherboot (Using PXE compatable mode) network-booting software.  This package contains one main utility: mkpxeinitrd-net (to build an initrd containing a specified set of network-card modules).
-  mkpxeinitrd-net uses code from busybox project, too.
+Depends: ${shlibs:Depends}, ${misc:Depends}, coreutils (>=8.5), pciutils, module-init-tools, procps, drbl (>= 2.0.0)
+Description: Build initial ramdisk images for DRBL clients
+ mkpxeinitrd-net is a derived program from mkinitrd-net.
+ mkpxeinitrd-net allows you to build initial ramdisk images (initrds) suitable
+ for use with PXE and Etherboot (Using PXE compatible mode) network-booting
+ software.  This package contains one main utility: mkpxeinitrd-net
+ (to build an initrd containing a specified set of network-card modules).
+ mkpxeinitrd-net uses code from busybox project, too.

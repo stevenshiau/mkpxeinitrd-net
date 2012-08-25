@@ -50,6 +50,7 @@ echo Busybox $initfile starting
 
 [ -d /dev ] || mkdir -m 0755 /dev
 [ -d /root ] || mkdir -m 0700 /root
+[ -d /sysroot ] || mkdir -m 0700 /sysroot
 [ -d /sys ] || mkdir /sys
 [ -d /proc ] || mkdir /proc
 [ -d /tmp ] || mkdir /tmp
