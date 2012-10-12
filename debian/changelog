@@ -1,3 +1,9 @@
+mkpxeinitrd-net (2.0.6-drbl1) unstable; urgency=low
+
+  * Bug fixed: /run should be umounted before exiting initrd.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Fri, 12 Oct 2012 19:30:07 +0800
+
 mkpxeinitrd-net (2.0.5-drbl1) unstable; urgency=low
 
   * Bug fixed: $initrd/dev should be created before node files are made.

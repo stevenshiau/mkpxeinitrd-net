@@ -257,14 +257,16 @@ if [ "$start_udevd" = "yes" ]; then
   rm -rf /dev/.udev/queue
 fi
 
-if [ -d /sysroot/run ]; then
-  mount --move -n /run/ /sysroot/run
-fi
-
 if [ -d /sysroot/initrd ]; then
   $echo "Unmounting /proc and /sys prior to pivot_root or switch_root"
   umount -n /proc 2>/dev/null
   umount -n /sys 2>/dev/null
+
+  if mountpoint /run 2>/dev/null 1>&2; then
+    $echo "Unmounting /run prior to pivot_root or switch_root"
+    #mount --move -n /run/ /sysroot/run
+    umount -n /run
+  fi
 
   $echo "Remounting dev at correct place"
   # No more devfs, we use tmpfs and tarball dev (created in drblsrv) or udev
