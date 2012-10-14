@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.0.6
+Version: 2.0.7
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -12,7 +12,7 @@ Group: System/Kernel and hardware
 URL: http://www.fensystems.co.uk/SRPMS.fensys
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
-Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.0.14
+Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.1.13
 Obsoletes: mkinitrd-net
 ExclusiveArch: %{ix86}, x86_64
 
@@ -52,6 +52,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Sun Oct 14 2012 Steven Shiau <steven _at_ nchc org tw> 2.0.7-drbl1
+- Bug fixed: For Linux kernel 3.6, the required modules for NFS are not only nfs.ko, yet more modules are required, e.g. nfsv2.ko, nfsv3.ko, nfsv4.ko...
+
 * Fri Oct 12 2012 Steven Shiau <steven _at_ nchc org tw> 2.0.6-drbl1
 - Bug fixed: /run should be umounted before exiting initrd.
 

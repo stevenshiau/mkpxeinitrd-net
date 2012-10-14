@@ -52,7 +52,10 @@ else
 fi
 
 # Regure expression to grep the nfs.ko
-nfs_mod_reg="^$nfs_mod_path/nfs\.ko(\.gz)*:"
+# From Linux kernel 3.6.x, the modules for NFS are:
+# nfs.ko  nfs_layout_nfsv41_files.ko  nfsv2.ko  nfsv3.ko  nfsv4.ko
+# They are found in dir like /lib/modules/3.6.1-1.fc17.i686/kernel/fs/nfs/.
+nfs_mod_reg="^$nfs_mod_path/nfs.*\.ko(\.gz)*:"
 
 # Actually for NFS, we do not have to exclude some module now, but who knows in
 # the future ?

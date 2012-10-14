@@ -1,3 +1,10 @@
+mkpxeinitrd-net (2.0.7-drbl1) unstable; urgency=low
+
+  * Bug fixed: For Linux kernel 3.6, the required modules for NFS are not 
+    only nfs.ko, yet more modules are required, e.g. nfsv2.ko, nfsv3.ko, nfsv4.ko...
+
+ -- Steven Shiau <steven@nchc.org.tw>  Sun, 14 Oct 2012 16:16:51 +0800
+
 mkpxeinitrd-net (2.0.6-drbl1) unstable; urgency=low
 
   * Bug fixed: /run should be umounted before exiting initrd.

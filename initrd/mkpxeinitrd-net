@@ -454,16 +454,17 @@ fi
 
 # Some required files for mount.nfs
   # /etc/netconfig does not exist on CentOS 5.
-  mount_required_etc="services protocols netconfig"
+  mount_required_etc="services protocols netconfig nsswitch.conf nfsmount.conf"
   for i in $mount_required_etc; do
     [ ! -e /etc/$i ] && continue
     copy_exec_not_link /etc/$i /etc/
   done
-# /lib/libnss_file* are required for mount.nfs, which ldd won't show
+# /lib/libnss_file* and libnss_nis* are required for mount.nfs, which ldd won't show. We found that by strace.
   # Since libnss_files could be in /lib/, /lib/i386-linux-gnu (Debian), /lib64/ (Fedora)... We search them.
   LIBNSS_FILES_DIR="/lib/"
   [ -d "/lib64" ] && LIBNSS_FILES_DIR="$LIBNSS_FILES_DIR /lib64/"
   LIBNSS_FILES="$(LC_ALL=C find $LIBNSS_FILES_DIR -name "libnss_files*" -print)"
+  LIBNSS_FILES="$LIBNSS_FILES $(LC_ALL=C find $LIBNSS_FILES_DIR -name "libnss_nis*" -print)"
   for i in $LIBNSS_FILES; do
     DIRNM="$(dirname $i)"
     mkdir -p $DESTDIR/$DIRNM
