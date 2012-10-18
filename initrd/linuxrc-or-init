@@ -265,7 +265,7 @@ if [ -d /sysroot/initrd ]; then
   if mountpoint /run 2>/dev/null 1>&2; then
     $echo "Unmounting /run prior to pivot_root or switch_root"
     #mount --move -n /run/ /sysroot/run
-    umount -n /run
+    umount -n -l /run 2>/dev/null
   fi
 
   $echo "Remounting dev at correct place"
