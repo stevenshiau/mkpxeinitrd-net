@@ -1,3 +1,11 @@
+mkpxeinitrd-net (2.0.9-drbl1) unstable; urgency=low
+
+  * Bug fixed: it's better to wait for 1 sec after the network module
+    is inserted in insert-modules. Otherwise the device might not be 
+    shown in /sys or /proc.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Tue, 04 Dec 2012 09:52:40 +0800
+
 mkpxeinitrd-net (2.0.8-drbl1) unstable; urgency=low
 
   * Suppress the error message when umounting /run.

@@ -22,6 +22,8 @@ NIC_MOD="$(scan_pci)"
 for mod in $NIC_MOD; do
   modprobe $mod 2>/dev/null
 done
+# Wait for 1 sec so that /proc or /sys is ready
+sleep 1
 netdevices="$(get-nic-devs)"
 if [ -z "$netdevices" ]; then
   kernel_ver=`uname -r`
