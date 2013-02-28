@@ -1,8 +1,8 @@
-%define BUSYBOX_VERSION 1.20.2
+%define BUSYBOX_VERSION 1.21.0
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.0.9
+Version: 2.0.10
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -12,7 +12,7 @@ Group: System/Kernel and hardware
 URL: http://www.fensystems.co.uk/SRPMS.fensys
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
-Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.1.45
+Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.3.10
 Obsoletes: mkinitrd-net
 ExclusiveArch: %{ix86}, x86_64
 
@@ -52,6 +52,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Thu Feb 28 2013 Steven Shiau <steven _at_ nchc org tw> 2.0.10-drbl1
+- New upstream busybox 1.21.0.
+
 * Tue Dec 04 2012 Steven Shiau <steven _at_ nchc org tw> 2.0.9-drbl1
 - Bug fixed: it's better to wait for 1 sec after the network module is inserted in insert-modules. Otherwise the device might not be shown in /sys or /proc.
 
