@@ -42,7 +42,7 @@ busybox : $(BUSYBOX)
 $(BUSYBOX) : $(BUSYBOX).tar.bz2
 	[ -d $@ ] || tar xvjf $<
 	install -m 644 config.busybox/$(BUSYBOX).config $(BUSYBOX)/.config
-	$(MAKE) -C $(BUSYBOX)
+	$(MAKE) $(MP_OPT) -C $(BUSYBOX)
 	install -m 644 $(BUSYBOX)/AUTHORS AUTHORS.busybox
 	install -m 644 $(BUSYBOX)/LICENSE LICENSE.busybox
 
