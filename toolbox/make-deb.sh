@@ -26,7 +26,7 @@ busybox_pkg="busybox-$BUSYBOX_VER.tar.bz2"
 rm -rf debforge
 mkdir debforge
 (cd debforge; ln -fs ../$TARBALL $TARBALL_ORIG)
-tar -xvjf $TARBALL -C debforge/
+tar -xjf $TARBALL -C debforge/
 # With Debian format 3.0, you can not put binary file in a package unless it's assigned by  debian/source/include-binaries.
 # The error messages:
 # dpkg-source: info: using source format `3.0 (quilt)'
