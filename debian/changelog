@@ -1,3 +1,10 @@
+mkpxeinitrd-net (2.0.11-drbl1) unstable; urgency=low
+
+  * Bug fixed: wrong path for file COPYING. Thanks to Andreas Mohr 
+    for reporting this issue.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Mon, 06 May 2013 16:37:33 +0800
+
 mkpxeinitrd-net (2.0.10-drbl1) unstable; urgency=low
 
   * New upstream busybox 1.21.0.
