@@ -9,7 +9,7 @@ Homepage: http://drbl.org/
 
 Package: mkpxeinitrd-net
 Architecture: i386 amd64
-Depends: ${shlibs:Depends}, ${misc:Depends}, coreutils, pciutils, module-init-tools, procps, drbl (>= 2.0.0)
+Depends: ${shlibs:Depends}, ${misc:Depends}, coreutils, pciutils, module-init-tools, procps, drbl (>= 2.4.39)
 Description: Build initial ramdisk images for DRBL clients
  mkpxeinitrd-net is a derived program from mkinitrd-net.
  mkpxeinitrd-net allows you to build initial ramdisk images (initrds) suitable

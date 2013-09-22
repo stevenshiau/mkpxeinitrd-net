@@ -1,4 +1,4 @@
-BUSYBOX_VERSION = 1.21.0
+BUSYBOX_VERSION = 1.21.1
 BUSYBOX = busybox-$(BUSYBOX_VERSION)
 $(BUSYBOX)_SOURCE = http://www.busybox.net/downloads/$(BUSYBOX).tar.bz2
 
@@ -115,9 +115,10 @@ install :
 	mkdir -p $(sysconfdir)
 	mkdir -p $(initrdskeldir)
 	mkdir -p $(hooksdir)
+	mkdir -p $(libdir)/mkpxeinitrd-net/bin/
 	install -m 755 \
-	        mkpxeinitrd-net parse-net-mod parse-nfs-mod $(bindir)/
+	        mkpxeinitrd-net $(bindir)/
 	install -m 755 \
-	        mkpxeinitrd-net-func $(libdir)/mkpxeinitrd-net/
+	        mkpxeinitrd-net-func parse-net-mod parse-nfs-mod $(libdir)/mkpxeinitrd-net/bin/
 	cp -a initrd-skel/* $(initrdskeldir)/
 	cp -a hooks/* $(hooksdir)/

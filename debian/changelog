@@ -1,3 +1,11 @@
+mkpxeinitrd-net (2.1.0-drbl1) unstable; urgency=low
+
+  * New upstream busybox 1.21.1.
+  * Files mkpxeinitrd-net-func, parse-net-mod and parse-nfs-mod were 
+    moved to /usr/lib/mkpxeinitrd-net/bin/.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Sun, 22 Sep 2013 11:56:15 +0800
+
 mkpxeinitrd-net (2.0.11-drbl1) unstable; urgency=low
 
   * Bug fixed: wrong path for file COPYING. Thanks to Andreas Mohr 

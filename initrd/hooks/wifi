@@ -18,7 +18,7 @@ esac
 [ -x /sbin/iwconfig ] || exit 0
 
 # Load functions
-. /usr/lib/mkpxeinitrd-net/mkpxeinitrd-net-func
+. /usr/lib/mkpxeinitrd-net/bin/mkpxeinitrd-net-func
 
 #mkdir -p ${DESTDIR}/usr/lib/usplash
 

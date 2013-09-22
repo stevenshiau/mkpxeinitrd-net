@@ -1,8 +1,8 @@
-%define BUSYBOX_VERSION 1.21.0
+%define BUSYBOX_VERSION 1.21.1
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.0.11
+Version: 2.1.0
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -12,7 +12,7 @@ Group: System/Kernel and hardware
 URL: http://www.fensystems.co.uk/SRPMS.fensys
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
-Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.3.10
+Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.4.39
 Obsoletes: mkinitrd-net
 ExclusiveArch: %{ix86}, x86_64
 
@@ -43,8 +43,6 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %{_bindir}/mkpxeinitrd-net
-%{_bindir}/parse-net-mod
-%{_bindir}/parse-nfs-mod
 
 #
 %{_libdir}/mkpxeinitrd-net
@@ -52,6 +50,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Sun Sep 22 2013 Steven Shiau <steven _at_ nchc org tw> 2.1.0-drbl1
+- New upstream busybox 1.21.1.
+- Files mkpxeinitrd-net-func, parse-net-mod and parse-nfs-mod were moved to /usr/lib/mkpxeinitrd-net/bin/.
+
 * Mon May 06 2013 Steven Shiau <steven _at_ nchc org tw> 2.0.11-drbl1
 - Bug fixed: wrong path for file COPYING. Thanks to Andreas Mohr for reporting this issue.
 

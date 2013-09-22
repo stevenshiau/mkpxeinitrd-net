@@ -11,9 +11,10 @@
 # Load the config, some variables about drbl might be required in this program. E.g. $drbl_common_root
 DRBL_SCRIPT_PATH="${DRBL_SCRIPT_PATH:-/usr/share/drbl}"
 [ -e /etc/drbl/drbl.conf ] && . /etc/drbl/drbl.conf
+export PATH=$PATH:/usr/lib/mkpxeinitrd-net/bin/
 
 # Load functions
-. /usr/lib/mkpxeinitrd-net/mkpxeinitrd-net-func
+. /usr/lib/mkpxeinitrd-net/bin/mkpxeinitrd-net-func
 
 # Default settings (some can be overridden by command-line options)
 include_modules=include-modules
@@ -303,7 +304,7 @@ elif [ -n "$(echo $kernel_ver | grep -E "(^2\.6\.|^3\.)")" ]; then
    # insmod /lib/modules/2.6.17-1.2630.fc6/kernel/fs/fscache/fscache.ko
    # insmod /lib/modules/2.6.17-1.2630.fc6/kernel/fs/lockd/lockd.ko
    # insmod /lib/modules/2.6.17-1.2630.fc6/kernel/fs/nfs/nfs.ko
-   nfs_mods="$(parse-nfs-mod -p "$drbl_kernel_mod_path" -k $kernel_ver)"
+   nfs_mods="$(LC_ALL=C parse-nfs-mod -p "$drbl_kernel_mod_path" -k $kernel_ver)"
    cp -a --parents $nfs_mods $initrd/lib/modules/$kernel_ver/
 
    # (c). For network device modules
@@ -314,7 +315,7 @@ elif [ -n "$(echo $kernel_ver | grep -E "(^2\.6\.|^3\.)")" ]; then
    else
      wireless_mod_option=""
    fi
-   net_mods="$(parse-net-mod $wireless_mod_option -p "$drbl_kernel_mod_path" -k $kernel_ver)"
+   net_mods="$(LC_ALL=C parse-net-mod $wireless_mod_option -p "$drbl_kernel_mod_path" -k $kernel_ver)"
    # To avoid net_mods is too long, we use for loop here
    for i in $net_mods; do
      cp -a --parents $i $initrd/lib/modules/$kernel_ver/

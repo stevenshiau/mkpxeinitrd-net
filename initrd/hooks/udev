@@ -20,7 +20,7 @@ esac
 
 
 # Load functions
-. /usr/lib/mkpxeinitrd-net/mkpxeinitrd-net-func
+. /usr/lib/mkpxeinitrd-net/bin/mkpxeinitrd-net-func
 
 # We use pkill
 copy_exec_not_link /usr/bin/pkill /sbin
