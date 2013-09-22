@@ -1,9 +1,9 @@
 Source: mkpxeinitrd-net
 Section: admin
 Priority: extra
-Maintainer: Steven Shiau <steven@nchc.org.tw>
+Maintainer: Steven Shiau <steven@stevenshiau.org>
 Uploaders: Georges Khaznadar <georgesk@ofset.org>
-Build-Depends: debhelper (>= 9)
+Build-Depends: debhelper (>= 9), wget
 Standards-Version: 3.9.3
 Homepage: http://drbl.org/
 
