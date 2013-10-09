@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.1.0
+Version: 2.1.1
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -12,7 +12,7 @@ Group: System/Kernel and hardware
 URL: http://www.fensystems.co.uk/SRPMS.fensys
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
-Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.4.39
+Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.5.8
 Obsoletes: mkinitrd-net
 ExclusiveArch: %{ix86}, x86_64
 
@@ -31,7 +31,8 @@ mkpxeinitrd-net uses code from busybox projects.
 #perl -pi -e "s/-Wl,--gc-sections//g" busybox-%{BUSYBOX_VERSION}/scripts/trylink
 #perl -pi -e "s/-Wl,--sort-section -Wl,alignment//g" busybox-%{BUSYBOX_VERSION}/scripts/trylink
 #perl -pi -e "s/^#error Aborting compilation.*//g" busybox-%{BUSYBOX_VERSION}/applets/applets.c
-make -j4
+make clean
+make
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -50,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Wed Oct 09 2013 Steven Shiau <steven _at_ nchc org tw> 2.1.1-drbl1
+- Adding xargs applet in busybox.
+
 * Sun Sep 22 2013 Steven Shiau <steven _at_ nchc org tw> 2.1.0-drbl1
 - New upstream busybox 1.21.1.
 - Files mkpxeinitrd-net-func, parse-net-mod and parse-nfs-mod were moved to /usr/lib/mkpxeinitrd-net/bin/.

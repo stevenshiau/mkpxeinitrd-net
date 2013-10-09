@@ -92,6 +92,7 @@ initrd-skel : $(UTILS) linuxrc-or-init udhcpc-post
 	ln -s busybox $@/bin/mountpoint
 	ln -s busybox $@/bin/wc
 	ln -s busybox $@/bin/ps
+	ln -s busybox $@/bin/xargs
 
 	install -m 755 linuxrc-or-init $@/linuxrc-or-init
 	install -m 755 udhcpc-post $@/bin/udhcpc-post

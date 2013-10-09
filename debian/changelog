@@ -1,3 +1,9 @@
+mkpxeinitrd-net (2.1.1-drbl1) unstable; urgency=low
+
+  * Adding xargs applet in busybox.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Wed, 09 Oct 2013 09:09:21 +0800
+
 mkpxeinitrd-net (2.1.0-drbl1) unstable; urgency=low
 
   * New upstream busybox 1.21.1.
