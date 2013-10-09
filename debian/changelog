@@ -1,3 +1,9 @@
+mkpxeinitrd-net (2.1.3-drbl1) unstable; urgency=low
+
+  * More prompts were added in insert-modules.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Wed, 09 Oct 2013 11:28:08 +0800
+
 mkpxeinitrd-net (2.1.2-drbl1) unstable; urgency=low
 
   * Bug fixed: newer linux kerenl and depmod do not create modules.pcimap, 

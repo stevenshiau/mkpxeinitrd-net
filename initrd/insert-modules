@@ -20,7 +20,8 @@ done
 sleep 1
 # Detect and load the network devices
 NIC_MOD="$(scan_pci)"
-if [ -n "$NIC_MOD" ]; then
+rc=$?
+if [ "$rc" -eq 0 ]; then
   echo "The detected modules for hardware: $NIC_MOD. Try to load them..."
   for mod in $NIC_MOD; do
     modprobe $mod 2>/dev/null
@@ -28,6 +29,7 @@ if [ -n "$NIC_MOD" ]; then
 fi
 # From Linux kernel 3.7 or later, no more modules.pcimap, so the above "scan_pci" method will fail, so we can use modules.alias
 if [ -d /sys/bus/pci/devices ]; then
+  echo "Dir /sys/bus/pci/devices found. Try to load modules based on modules.alias..."
   cat /sys/bus/pci/devices/*/modalias 2>/dev/null | sort | uniq | xargs modprobe -R
 fi
 netdevices="$(get-nic-devs)"

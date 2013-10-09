@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.1.1
+Version: 2.1.3
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Wed Oct 09 2013 Steven Shiau <steven _at_ nchc org tw> 2.1.3-drbl1
+- More prompts were added in insert-modules.
+
 * Wed Oct 09 2013 Steven Shiau <steven _at_ nchc org tw> 2.1.1-drbl1
 - Adding xargs applet in busybox.
 - Bug fixed: newer linux kerenl and depmod do not create modules.pcimap, so the scan_pci will fail. Therefore a better mechanism to use modules.alias was added in insert-modules.

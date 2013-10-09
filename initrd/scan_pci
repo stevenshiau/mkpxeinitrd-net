@@ -68,6 +68,6 @@ if [ -n "$mod_found" ]; then
   echo "$mod_found"
   exit 0
 else
-  echo "Not any known PCI device is found!!!"
+  echo "Not any known PCI device is found by scan_pic. Another method will be used later..."
   exit 1
 fi
