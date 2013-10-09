@@ -53,6 +53,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Wed Oct 09 2013 Steven Shiau <steven _at_ nchc org tw> 2.1.1-drbl1
 - Adding xargs applet in busybox.
+- Bug fixed: newer linux kerenl and depmod do not create modules.pcimap, so the scan_pci will fail. Therefore a better mechanism to use modules.alias was added in insert-modules.
 
 * Sun Sep 22 2013 Steven Shiau <steven _at_ nchc org tw> 2.1.0-drbl1
 - New upstream busybox 1.21.1.

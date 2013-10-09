@@ -16,14 +16,20 @@ while read module args; do
   modprobe $module $args 2>/dev/null
 done
 
-# Detect and load the network devices
-NIC_MOD="$(scan_pci)"
-[ -n "$NIC_MOD" ] && echo "The detected modules for hardware: $NIC_MOD. Try to load them..."
-for mod in $NIC_MOD; do
-  modprobe $mod 2>/dev/null
-done
 # Wait for 1 sec so that /proc or /sys is ready
 sleep 1
+# Detect and load the network devices
+NIC_MOD="$(scan_pci)"
+if [ -n "$NIC_MOD" ]; then
+  echo "The detected modules for hardware: $NIC_MOD. Try to load them..."
+  for mod in $NIC_MOD; do
+    modprobe $mod 2>/dev/null
+  done
+fi
+# From Linux kernel 3.7 or later, no more modules.pcimap, so the above "scan_pci" method will fail, so we can use modules.alias
+if [ -d /sys/bus/pci/devices ]; then
+  cat /sys/bus/pci/devices/*/modalias 2>/dev/null | sort | uniq | xargs modprobe -R
+fi
 netdevices="$(get-nic-devs)"
 if [ -z "$netdevices" ]; then
   kernel_ver=`uname -r`

@@ -1,3 +1,11 @@
+mkpxeinitrd-net (2.1.2-drbl1) unstable; urgency=low
+
+  * Bug fixed: newer linux kerenl and depmod do not create modules.pcimap, 
+    so the scan_pci will fail. Therefore a better mechanism to use 
+    modules.alias was added in insert-modules.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Wed, 09 Oct 2013 11:02:32 +0800
+
 mkpxeinitrd-net (2.1.1-drbl1) unstable; urgency=low
 
   * Adding xargs applet in busybox.
