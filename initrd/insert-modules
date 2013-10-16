@@ -32,6 +32,8 @@ if [ -d /sys/bus/pci/devices ]; then
   echo "Dir /sys/bus/pci/devices found. Try to load modules based on modules.alias..."
   cat /sys/bus/pci/devices/*/modalias 2>/dev/null | sort | uniq | xargs modprobe -R
 fi
+# Wait for 1 sec so that device is up
+sleep 1
 netdevices="$(get-nic-devs)"
 if [ -z "$netdevices" ]; then
   kernel_ver=`uname -r`
