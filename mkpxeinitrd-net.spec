@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.1.4
+Version: 2.1.5
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -12,7 +12,7 @@ Group: System/Kernel and hardware
 URL: http://www.fensystems.co.uk/SRPMS.fensys
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
-Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.5.12
+Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.7.39
 Obsoletes: mkinitrd-net
 ExclusiveArch: %{ix86}, x86_64
 
@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Sun Mar 23 2014 Steven Shiau <steven _at_ nchc org tw> 2.1.5-drbl1
+- The error message of "modprobe -R" is suppressed because on older version (e.g. on CentOS 6) no option "-R".
+
 * Wed Oct 16 2013 Steven Shiau <steven _at_ nchc org tw> 2.1.4-drbl1
 - Adding sleep 1 after modules are loaded. Some devices might come up not so fast.
 

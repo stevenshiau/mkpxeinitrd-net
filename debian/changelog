@@ -1,3 +1,10 @@
+mkpxeinitrd-net (2.1.5-drbl1) unstable; urgency=low
+
+  * The error message of "modprobe -R" is suppressed because on 
+    older version (e.g. on CentOS 6) no option "-R".
+
+ -- Steven Shiau <steven@nchc.org.tw>  Sun, 23 Mar 2014 14:36:11 +0800
+
 mkpxeinitrd-net (2.1.4-drbl1) unstable; urgency=low
 
   * Adding sleep 1 after modules are loaded. Some devices might come up not so

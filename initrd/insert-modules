@@ -30,7 +30,9 @@ fi
 # From Linux kernel 3.7 or later, no more modules.pcimap, so the above "scan_pci" method will fail, so we can use modules.alias
 if [ -d /sys/bus/pci/devices ]; then
   echo "Dir /sys/bus/pci/devices found. Try to load modules based on modules.alias..."
-  cat /sys/bus/pci/devices/*/modalias 2>/dev/null | sort | uniq | xargs modprobe -R
+  # Due to older version of modprobe, like module-init-tools (3.9) (it still has modules.pcimap) on CentOS 6 does not support option "-R". 
+  # Therefore we have to suppress the error messages.
+  cat /sys/bus/pci/devices/*/modalias 2>/dev/null | sort | uniq | xargs modprobe -R 2>/dev/null
 fi
 # Wait for 1 sec so that device is up
 sleep 1
