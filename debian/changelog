@@ -1,3 +1,10 @@
+mkpxeinitrd-net (2.2.1-drbl1) unstable; urgency=low
+
+  * Adding mechanism to support nfs4 case.
+  * New upstream busybox 1.22.1.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Sun, 13 Apr 2014 00:06:50 +0800
+
 mkpxeinitrd-net (2.1.5-drbl1) unstable; urgency=low
 
   * The error message of "modprobe -R" is suppressed because on 

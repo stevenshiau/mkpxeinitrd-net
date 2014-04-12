@@ -1,8 +1,8 @@
-%define BUSYBOX_VERSION 1.21.1
+%define BUSYBOX_VERSION 1.22.1
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.1.5
+Version: 2.2.1
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -12,7 +12,7 @@ Group: System/Kernel and hardware
 URL: http://www.fensystems.co.uk/SRPMS.fensys
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
-Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.7.39
+Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.8.10
 Obsoletes: mkinitrd-net
 ExclusiveArch: %{ix86}, x86_64
 
@@ -51,7 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Sun Apr 13 2014 Steven Shiau <steven _at_ nchc org tw> 2.2.1-drbl1
 - Adding mechanism to support nfs4 case.
+- New upstream busybox 1.22.1.
 
 * Sun Mar 23 2014 Steven Shiau <steven _at_ nchc org tw> 2.1.5-drbl1
 - The error message of "modprobe -R" is suppressed because on older version (e.g. on CentOS 6) no option "-R".

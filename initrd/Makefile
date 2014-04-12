@@ -1,4 +1,4 @@
-BUSYBOX_VERSION = 1.21.1
+BUSYBOX_VERSION = 1.22.1
 BUSYBOX = busybox-$(BUSYBOX_VERSION)
 $(BUSYBOX)_SOURCE = http://www.busybox.net/downloads/$(BUSYBOX).tar.bz2
 
