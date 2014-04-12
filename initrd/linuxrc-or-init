@@ -257,6 +257,10 @@ if [ "$start_udevd" = "yes" ]; then
   rm -rf /dev/.udev/queue
 fi
 
+# Stop rpc.idmapd. Later we will start it in init.drbl. This is for NFS4.
+# Here we just run it no matter it's on NFS3 or NFS4.
+pkill rpc.idmapd
+
 if [ -d /sysroot/initrd ]; then
   $echo "Unmounting /proc and /sys prior to pivot_root or switch_root"
   umount -n /proc 2>/dev/null

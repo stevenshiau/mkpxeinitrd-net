@@ -51,6 +51,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+- Adding mechanism to support nfs4 case.
+
 * Sun Mar 23 2014 Steven Shiau <steven _at_ nchc org tw> 2.1.5-drbl1
 - The error message of "modprobe -R" is suppressed because on older version (e.g. on CentOS 6) no option "-R".
 
