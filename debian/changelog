@@ -1,3 +1,9 @@
+mkpxeinitrd-net (2.2.2-drbl1) unstable; urgency=low
+
+  * NFS4 support in udhcpc-post was added.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Sun, 13 Apr 2014 10:46:49 +0800
+
 mkpxeinitrd-net (2.2.1-drbl1) unstable; urgency=low
 
   * Adding mechanism to support nfs4 case.
