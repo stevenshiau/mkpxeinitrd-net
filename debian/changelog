@@ -1,3 +1,11 @@
+mkpxeinitrd-net (2.2.3-drbl1) unstable; urgency=low
+
+  * Because only root account is available in initrd, the rpc.idmapd
+    will be mapped to root when starting. It will be stopped before
+    exiting initrd. Therefore the booting process now will be faster.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Sun, 13 Apr 2014 11:45:25 +0800
+
 mkpxeinitrd-net (2.2.2-drbl1) unstable; urgency=low
 
   * NFS4 support in udhcpc-post was added.
