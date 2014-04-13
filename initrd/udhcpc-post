@@ -16,7 +16,18 @@
 #
 #RWSIZE_OPT="rsize=65536,wsize=65536"
 RWSIZE_OPT=""
-ROOT_NFS_OPT="ro,nfsvers=3,tcp,nolock,$RWSIZE_OPT"
+case "$nfs_prot_in_initrd" in
+  nfs4) # NFS4
+	ROOT_NFS_OPT="ro,nolock,$RWSIZE_OPT"
+	# fstype is used for mount -t $fstype
+	fstype="nfs4"
+	;;
+     *) # NFS3
+	ROOT_NFS_OPT="ro,nfsvers=3,tcp,nolock,$RWSIZE_OPT"
+	# fstype is used for mount -t $fstype
+	fstype="nfs"
+	;;
+esac
 
 # We can assign the root directory for clients, but it's rare, and you still
 # have to modify a lot of settings, such as /etc/exports in server.
@@ -65,8 +76,18 @@ else if [ "$1" = "bound" ] ; then
     for i in $dns; do
       echo nameserver $i >> /etc/resolv.conf
     done
-    [ -n "$siaddr" ] || siaddr=$serverid
-    [ -n "$rootpath" ] || rootpath="$siaddr:/tftpboot/$clientdir"
+    case "$nfs_prot_in_initrd" in
+      nfs4) # NFS4
+            # Start idmapd
+            rpc.idmapd &
+            [ -n "$siaddr" ] || siaddr=$serverid
+            [ -n "$rootpath" ] || rootpath="$siaddr:/$clientdir"
+	    ;;
+         *) # NFS3
+            [ -n "$siaddr" ] || siaddr=$serverid
+            [ -n "$rootpath" ] || rootpath="$siaddr:/tftpboot/$clientdir"
+	    ;;
+    esac
     # erase the space
     rootpath_=`echo $rootpath | sed -e "s/ //g"`
     rootpath="$rootpath_"
@@ -82,7 +103,7 @@ else if [ "$1" = "bound" ] ; then
     echo "check http://drbl.sourceforge.net/faq for more details!"
 
     echo "Mounting root filesystem $rootpath at /sysroot with option \"$ROOT_NFS_OPT\"..."
-    mount -t nfs -n -o $ROOT_NFS_OPT $rootpath /sysroot
+    mount -t $fstype -n -o $ROOT_NFS_OPT $rootpath /sysroot
     retv=$?
     if [ "$retv" -eq 0 ]; then
       echo "Mounted the root filesystem successfully! Continue..."
