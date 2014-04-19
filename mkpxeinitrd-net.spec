@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+- Updating the prompt about mounting /sys system.
+- Using drbl.org/faq instead of drbl.sourceforge.net/faq in the prompt.
+
 * Sun Apr 13 2014 Steven Shiau <steven _at_ nchc org tw> 2.2.3-drbl1
 - Because only root account is available in initrd, the rpc.idmapd will be mapped to root when starting. It will be stopped before exiting initrd. Therefore the booting process now will be faster.
 

@@ -55,7 +55,7 @@ echo Busybox $initfile starting
 [ -d /proc ] || mkdir /proc
 [ -d /tmp ] || mkdir /tmp
 mkdir -p /var/lock
-echo Trying to mount /sys filesystem
+echo Mounting /sys filesystem
 mount -n -t sysfs -o nodev,noexec,nosuid none /sys 
 echo Mounting /proc filesystem
 mount -n -t proc -o nodev,noexec,nosuid none /proc 

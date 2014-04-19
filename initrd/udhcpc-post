@@ -100,7 +100,7 @@ else if [ "$1" = "bound" ] ; then
     echo "2. The TCPwrapper setting (/etc/hosts.allow and /etc/hosts.deny) and firewall rules in your DRBL server, do you block the clients ?"
     echo "3. Is there any other dhcp server in this subnet ?"
     echo "4. The server of $rootpath is able to reverse-map my IP address $ip to obtain my hostname $hostname."
-    echo "check http://drbl.sourceforge.net/faq for more details!"
+    echo "check http://drbl.org/faq for more details!"
 
     echo "Mounting root filesystem $rootpath at /sysroot with option \"$ROOT_NFS_OPT\"..."
     mount -t $fstype -n -o $ROOT_NFS_OPT $rootpath /sysroot
