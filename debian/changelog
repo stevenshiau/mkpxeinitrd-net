@@ -1,3 +1,11 @@
+mkpxeinitrd-net (2.2.4-drbl1) unstable; urgency=low
+
+  * Updating the prompt about mounting /sys system.
+  * Using drbl.org/faq instead of drbl.sourceforge.net/faq
+    in the prompt.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Sun, 27 Apr 2014 13:56:59 +0800
+
 mkpxeinitrd-net (2.2.3-drbl1) unstable; urgency=low
 
   * Because only root account is available in initrd, the rpc.idmapd
