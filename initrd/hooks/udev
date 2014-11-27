@@ -38,11 +38,11 @@ cp -pL /etc/udev/udev.conf ${DESTDIR}/etc/udev
 # It's hard to tell them, just copy all of them.
 if [ -n "$(ls /etc/udev/rules.d/* 2>/dev/null)" ]; then
   mkdir -p ${DESTDIR}/etc/udev/rules.d
-  cp -pL /etc/udev/rules.d/* ${DESTDIR}/etc/udev/rules.d/
+  cp -rpL /etc/udev/rules.d/* ${DESTDIR}/etc/udev/rules.d/
 fi
 if [ -n "$(ls /lib/udev/rules.d/* 2>/dev/null)" ]; then
   mkdir -p ${DESTDIR}/lib/udev/rules.d
-  cp -pL /lib/udev/rules.d/* ${DESTDIR}/lib/udev/rules.d/
+  cp -rpL /lib/udev/rules.d/* ${DESTDIR}/lib/udev/rules.d/
 fi
 
 # Copy across helpers the rules need

@@ -51,6 +51,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+- Bug fixed: Failed to copy the dir in /lib/udev/rules.d/ to initrd.
+
 * Sun Apr 27 2014 Steven Shiau <steven _at_ nchc org tw> 2.2.4-drbl1
 - Updating the prompt about mounting /sys system.
 - Using drbl.org/faq instead of drbl.sourceforge.net/faq in the prompt.
