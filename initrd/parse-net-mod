@@ -1,5 +1,5 @@
 #!/bin/bash
-# Steven Shiau <steven _at_ nchc org tw>
+# Steven Shiau <steven _at_ nchc org tw>, Ceasar Sun <ceasar _at_ nchc org tw>
 # License: GPL
 # Description: To parse the /lib/modules/$KERNEL to get the modules for network
 # Usage: $0 KERNEL_VERSION
@@ -59,7 +59,7 @@ else
 fi
 
 # Regure expression to grep the nfs.ko
-net_mod_reg="^$net_mod_path/.*\.ko(\.gz)*:"
+net_mod_reg="^$net_mod_path/.*\.ko(\.gz|\.xz)*:"
 
 exclude_list="appletalk fc hamradio irda pcmcia tokenring wan irda"
 if [ "$include_wireless_modules" = "no" ]; then

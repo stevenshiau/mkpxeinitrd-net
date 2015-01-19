@@ -1,3 +1,11 @@
+mkpxeinitrd-net (2.2.6-drbl1) unstable; urgency=low
+
+  * Merged the patch from Ceasar Sun which improved parse-nfs-mod
+    and parse-net-mod so that it can parse the xz format of modules
+    on Fedora 21.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Mon, 19 Jan 2015 11:45:14 +0800
+
 mkpxeinitrd-net (2.2.5-drbl1) unstable; urgency=low
 
   * Bug fixed: Failed to copy the dir in /lib/udev/rules.d/ to initrd.

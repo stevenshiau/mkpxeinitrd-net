@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.2.5
+Version: 2.2.6
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Mon Jan 19 2015 Steven Shiau <steven _at_ nchc org tw> 2.2.6-drbl1
+- Merged the patch from Ceasar Sun which improved parse-nfs-mod and parse-net-mod so that it can parse the xz format of modules on Fedora 21.
+
 * Thu Nov 27 2014 Steven Shiau <steven _at_ nchc org tw> 2.2.5-drbl1
 - Bug fixed: Failed to copy the dir in /lib/udev/rules.d/ to initrd.
 
