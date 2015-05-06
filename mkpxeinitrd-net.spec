@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.2.6
+Version: 2.2.7
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -52,9 +52,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Wed May 06 2015 Steven Shiau <steven _at_ nchc org tw> 2.2.7-drbl1
-- Creating /dev/ram* and /dev/loop* in initramfs so that Ubunt 15.04 won't complain.
+- Creating /dev/ram* and /dev/loop* in initramfs so that Ubuntu 15.04 won't complain.
 - Suppress the error messages about "udevadm trigger". However, it seems not working.
 - New upstream busybox 1.23.2.
+- Make mkpxeinitrd-net be ready for Linux kernel version 4.
 
 * Mon Jan 19 2015 Steven Shiau <steven _at_ nchc org tw> 2.2.6-drbl1
 - Merged the patch from Ceasar Sun which improved parse-nfs-mod and parse-net-mod so that it can parse the xz format of modules on Fedora 21.
