@@ -33,7 +33,9 @@ mk_basic_dev() {
   mkdir /dev/usb
   for i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
     mknod /dev/usb/hiddev${i} c 180 $((96+i))
+    mknod -m 440 /dev/ram${i} b 1 ${i}
   done
+  for i in 0 1 2 3 4 5 6 7 ; do mknod -m 440 /dev/loop$i b 7 $i; done
 }
 
 # Two possibilities for initfs_type: 
@@ -115,8 +117,8 @@ if [ "$start_udevd" = "yes" ]; then
   # it'll get handled; otherwise it'll get handled later when we do this again
   # in the main boot sequence.
   if [ -x /sbin/udevadm ]; then
-    ( /sbin/udevadm trigger --subsystem-match=block; \
-      /sbin/udevadm trigger --subsystem-nomatch=block; ) &
+    ( /sbin/udevadm trigger --subsystem-match=block 2>/dev/null; \
+      /sbin/udevadm trigger --subsystem-nomatch=block 2>/dev/null; ) &
   fi
 else
   # Manually create dev files first. Later actually it will change to the dev system from GNU/Linux system.
@@ -145,7 +147,7 @@ $echo "Loading network device modules..."
 if [ -z "$quiet" ]; then
   /bin/insert-modules
 else
-  /bin/insert-modules >/dev/null
+  /bin/insert-modules >/dev/null 2>&1
 fi
 
 $echo "Bringing up loopback interface"
