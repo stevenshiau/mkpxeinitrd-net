@@ -1,3 +1,12 @@
+mkpxeinitrd-net (2.3.1-drbl1) unstable; urgency=low
+
+  * File pci.ids was updated.
+  * Bug fixed: insert-modules failed to use 
+    "modprobe -R" to load modules.
+  * Add support for systemd-udevd.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Mon, 18 May 2015 13:21:18 +0800
+
 mkpxeinitrd-net (2.2.7-drbl1) unstable; urgency=medium
 
   * Creating /dev/ram* and /dev/loop* in initramfs so that Ubuntu

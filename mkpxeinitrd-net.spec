@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.2.7
+Version: 2.3.1
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -12,7 +12,7 @@ Group: System/Kernel and hardware
 URL: http://www.fensystems.co.uk/SRPMS.fensys
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
-Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.8.22
+Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.15.1
 Obsoletes: mkinitrd-net
 ExclusiveArch: %{ix86}, x86_64
 
@@ -51,7 +51,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Mon May 18 2015 Steven Shiau <steven _at_ nchc org tw> 2.3.1-drbl1
 - File pci.ids was updated.
+- Bug fixed: insert-modules failed to use "modprobe -R" to load modules.
+- Add support for systemd-udevd.
 
 * Wed May 06 2015 Steven Shiau <steven _at_ nchc org tw> 2.2.7-drbl1
 - Creating /dev/ram* and /dev/loop* in initramfs so that Ubuntu 15.04 won't complain.
