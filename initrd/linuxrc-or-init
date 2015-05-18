@@ -81,12 +81,24 @@ fi
 
 # /dev/
 # We only will start udevd when it supports daemon mode. Otherwise like the udevd in CentOS 4.8, it will hang.
-if [ -e /etc/udev/udev.conf ] && \
-   [ -n "$(LC_ALL=C strings /sbin/udevd 2>/dev/null | grep -- "--daemon")" ]
-then
-   start_udevd="yes"
+udevd_prog=
+if [ -e /sbin/udevd ]; then
+  udevd_prog=/sbin/udevd
+elif [ -e /usr/lib/systemd/systemd-udevd ]; then
+  udevd_prog=/usr/lib/systemd/systemd-udevd
 else
-   start_udevd="no"
+  echo "***************************"
+  echo "Warning! udevd _NOT_ found!"
+  echo "***************************"
+  sleep 10
+fi
+if [ -n "$udevd_prog" -a -e /etc/udev/udev.conf ]; then
+  if [ -n "$(LC_ALL=C strings $udevd_prog 2>/dev/null | grep -- "--daemon")" ]
+  then
+     start_udevd="yes"
+  else
+     start_udevd="no"
+  fi
 fi
 if [ "$start_udevd" = "yes" ]; then
   # udev
@@ -108,10 +120,10 @@ if [ "$start_udevd" = "yes" ]; then
   # Instead of using "/sbin/udevd --help", we use strings here. 
   # This workaround is to avoid this weird case:
   # http://sourceforge.net/projects/drbl/forums/forum/394007/topic/3729074
-  if [ -n "$(LC_ALL=C strings /sbin/udevd 2>/dev/null | grep -- "--resolve-names")" ]; then
+  if [ -n "$(LC_ALL=C strings $udevd_prog 2>/dev/null | grep -- "--resolve-names")" ]; then
    resolve_name_opt="--resolve-names=never"
   fi
-  /sbin/udevd --daemon $resolve_name_opt
+  $udevd_prog --daemon $resolve_name_opt
   
   # Iterate sysfs and fire off everything; if we include a rule for it then
   # it'll get handled; otherwise it'll get handled later when we do this again

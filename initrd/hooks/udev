@@ -27,6 +27,7 @@ copy_exec_not_link /usr/bin/pkill /sbin
 
 # Copy across the udev binaries
 [ -e /sbin/udevd ] && copy_exec_not_link /sbin/udevd /sbin
+[ -e /usr/lib/systemd/systemd-udevd ] && copy_exec_not_link /usr/lib/systemd/systemd-udevd
 [ -e /sbin/udevadm ] && copy_exec_not_link /sbin/udevadm /sbin
 
 # Copy udev configuration
