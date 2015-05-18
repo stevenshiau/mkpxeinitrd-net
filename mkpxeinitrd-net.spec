@@ -51,6 +51,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+- File pci.ids was updated.
+
 * Wed May 06 2015 Steven Shiau <steven _at_ nchc org tw> 2.2.7-drbl1
 - Creating /dev/ram* and /dev/loop* in initramfs so that Ubuntu 15.04 won't complain.
 - Suppress the error messages about "udevadm trigger". However, it seems not working.
