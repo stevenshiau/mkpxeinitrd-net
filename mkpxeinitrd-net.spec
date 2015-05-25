@@ -51,6 +51,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+- Loading drbl-conf-functions in mkpxeinitrd-net so that color output can be shown.
+
 * Mon May 25 2015 Steven Shiau <steven _at_ nchc org tw> 2.3.2-drbl1
 - Improvement: Failed to create PXE initramfs for linux kernel 4.
 

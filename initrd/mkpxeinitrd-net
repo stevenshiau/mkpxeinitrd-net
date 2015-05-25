@@ -10,7 +10,9 @@
 
 # Load the config, some variables about drbl might be required in this program. E.g. $drbl_common_root
 DRBL_SCRIPT_PATH="${DRBL_SCRIPT_PATH:-/usr/share/drbl}"
-[ -e /etc/drbl/drbl.conf ] && . /etc/drbl/drbl.conf
+
+. $DRBL_SCRIPT_PATH/sbin/drbl-conf-functions
+
 export PATH=$PATH:/usr/lib/mkpxeinitrd-net/bin/
 
 # Load functions
@@ -438,7 +440,10 @@ elif [ -n "$(echo $kernel_ver | grep -E "(^2\.6\.|^3\.|^4\.)")" ]; then
    fi
   )
 else 
-  echo "Kernel $kernel_ver is not supported! Program terminated!"
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
+  echo "Kernel $kernel_ver is not supported!"
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+  echo "Program terminated!"
   exit 1
 fi
 
