@@ -1,3 +1,9 @@
+mkpxeinitrd-net (2.3.2-drbl1) unstable; urgency=low
+
+  * Improvement: Failed to create PXE initramfs for linux kernel 4.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Mon, 25 May 2015 21:14:35 +0800
+
 mkpxeinitrd-net (2.3.1-drbl1) unstable; urgency=low
 
   * File pci.ids was updated.

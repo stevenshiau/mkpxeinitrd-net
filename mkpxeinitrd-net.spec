@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.3.1
+Version: 2.3.2
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Mon May 25 2015 Steven Shiau <steven _at_ nchc org tw> 2.3.2-drbl1
+- Improvement: Failed to create PXE initramfs for linux kernel 4.
+
 * Mon May 18 2015 Steven Shiau <steven _at_ nchc org tw> 2.3.1-drbl1
 - File pci.ids was updated.
 - Bug fixed: insert-modules failed to use "modprobe -R" to load modules.
