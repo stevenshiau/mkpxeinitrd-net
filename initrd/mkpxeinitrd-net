@@ -198,7 +198,7 @@ if [ -n "$initfs_type" ]; then
    initramfs|INITRAMFS) 
      if [ -z "$(echo "$kernel_ver" | grep -E "(^2\.6\.|^3\.|^3\.|^4\.)")" ]; then
        [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
-       echo "initramfs only works for kernel 2.6, 3 or 4!"
+       echo "Program mkpxeinitrd-net only works for kernel 2.6, 3 or 4!"
        [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
        echo "Program terminated!!!"
        exit 1
@@ -217,7 +217,7 @@ else
     [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
     if [ -z "$(echo "$kernel_ver" | grep -E "(^2\.6\.|^3\.|^3\.|^4\.)")" ]; then
       [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
-      echo "initramfs only works for kernel 2.6, 3 or 4!"
+      echo "Program mkpxeinitrd-net only works for kernel 2.6, 3 or 4!"
       [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
       echo "Program terminated!!!"
       exit 1
@@ -230,7 +230,7 @@ else
     if [ -z "$initfs_type" ]; then
       if [ -z "$(echo "$kernel_ver" | grep -E "(^2\.6\.|^3\.|^3\.|^4\.)")" ]; then
         [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
-        echo "initramfs only works for kernel 2.6, 3 or 4!"
+        echo "Program mkpxeinitrd-net only works for kernel 2.6, 3 or 4!"
         [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
         echo "Program terminated!!!"
         exit 1
