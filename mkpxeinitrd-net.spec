@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.3.2
+Version: 2.3.3
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,7 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Wed May 27 2015 Steven Shiau <steven _at_ nchc org tw> 2.3.3-drbl1
 - Loading drbl-conf-functions in mkpxeinitrd-net so that color output can be shown.
+- Only trigger when /proc/sys/kernel/hotplug exists for udev in init.
 
 * Mon May 25 2015 Steven Shiau <steven _at_ nchc org tw> 2.3.2-drbl1
 - Improvement: Failed to create PXE initramfs for linux kernel 4.

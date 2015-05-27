@@ -1,3 +1,12 @@
+mkpxeinitrd-net (2.3.3-drbl1) unstable; urgency=low
+
+  * Loading drbl-conf-functions in mkpxeinitrd-net so that
+    color output can be shown.
+  * Only trigger when /proc/sys/kernel/hotplug exists for
+    udev in init.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Wed, 27 May 2015 19:55:55 +0800
+
 mkpxeinitrd-net (2.3.2-drbl1) unstable; urgency=low
 
   * Improvement: Failed to create PXE initramfs for linux kernel 4.
