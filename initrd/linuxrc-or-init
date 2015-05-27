@@ -113,7 +113,9 @@ if [ "$start_udevd" = "yes" ]; then
   mkdir /dev/.initramfs
   mk_basic_dev
   # It's all over netlink now
-  echo "" > /proc/sys/kernel/hotplug
+  if [ -e /proc/sys/kernel/hotplug ]; then
+    echo "" > /proc/sys/kernel/hotplug
+  fi
   
   # Start the udev daemon to process events
   resolve_name_opt=""
