@@ -1,3 +1,10 @@
+mkpxeinitrd-net (2.3.4-drbl1) unstable; urgency=low
+
+  * Improvement: better way to get clientdir for GRUB uEFI NB
+    boot parameters in udhcpc-post.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Thu, 28 May 2015 06:10:49 +0800
+
 mkpxeinitrd-net (2.3.3-drbl1) unstable; urgency=low
 
   * Loading drbl-conf-functions in mkpxeinitrd-net so that

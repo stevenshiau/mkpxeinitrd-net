@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.3.3
+Version: 2.3.4
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Thu May 28 2015 Steven Shiau <steven _at_ nchc org tw> 2.3.4-drbl1
+- Improvement: better way to get clientdir for GRUB uEFI NB boot parameters in udhcpc-post.
+
 * Wed May 27 2015 Steven Shiau <steven _at_ nchc org tw> 2.3.3-drbl1
 - Loading drbl-conf-functions in mkpxeinitrd-net so that color output can be shown.
 - Only trigger when /proc/sys/kernel/hotplug exists for udev in init.
