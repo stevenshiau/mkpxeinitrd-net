@@ -1,3 +1,11 @@
+mkpxeinitrd-net (2.3.5-drbl1) unstable; urgency=low
+
+  * Udevd from systemd 220-6 is now in /lib/systemd/systemd-udevd.
+    Therefore the corresponding change has to be applied in
+    linuxrc-or-init.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Thu, 18 Jun 2015 08:42:17 +0800
+
 mkpxeinitrd-net (2.3.4-drbl1) unstable; urgency=low
 
   * Improvement: better way to get clientdir for GRUB uEFI NB

@@ -86,6 +86,8 @@ if [ -e /sbin/udevd ]; then
   udevd_prog=/sbin/udevd
 elif [ -e /usr/lib/systemd/systemd-udevd ]; then
   udevd_prog=/usr/lib/systemd/systemd-udevd
+elif [ -e /lib/systemd/systemd-udevd ]; then
+  udevd_prog=/lib/systemd/systemd-udevd
 else
   echo "***************************"
   echo "Warning! udevd _NOT_ found!"

@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.3.4
+Version: 2.3.5
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -12,7 +12,7 @@ Group: System/Kernel and hardware
 URL: http://www.fensystems.co.uk/SRPMS.fensys
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
-Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.15.1
+Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.15.14
 Obsoletes: mkinitrd-net
 ExclusiveArch: %{ix86}, x86_64
 
@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Thu Jun 18 2015 Steven Shiau <steven _at_ nchc org tw> 2.3.5-drbl1
+- Udevd from systemd 220-6 is now in /lib/systemd/systemd-udevd. Therefore the corresponding change has to be applied in linuxrc-or-init.
+
 * Thu May 28 2015 Steven Shiau <steven _at_ nchc org tw> 2.3.4-drbl1
 - Improvement: better way to get clientdir for GRUB uEFI NB boot parameters in udhcpc-post.
 
