@@ -1,3 +1,11 @@
+mkpxeinitrd-net (2.3.7-drbl1) unstable; urgency=low
+
+  * Suppress the error messages when starting systemd-udevd in
+    linuxrc-or-init. Some kernel modules are intended to be not
+    included in initramfs.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Thu, 18 Jun 2015 11:14:30 +0800
+
 mkpxeinitrd-net (2.3.6-drbl1) unstable; urgency=low
 
   * Forgot to put /systemd-udevd in /hooks/udev.

@@ -127,7 +127,7 @@ if [ "$start_udevd" = "yes" ]; then
   if [ -n "$(LC_ALL=C strings $udevd_prog 2>/dev/null | grep -- "--resolve-names")" ]; then
    resolve_name_opt="--resolve-names=never"
   fi
-  $udevd_prog --daemon $resolve_name_opt
+  $udevd_prog --daemon $resolve_name_opt 2>/dev/null
   
   # Iterate sysfs and fire off everything; if we include a rule for it then
   # it'll get handled; otherwise it'll get handled later when we do this again
