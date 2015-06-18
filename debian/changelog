@@ -1,3 +1,9 @@
+mkpxeinitrd-net (2.3.6-drbl1) unstable; urgency=low
+
+  * Forgot to put /systemd-udevd in /hooks/udev.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Thu, 18 Jun 2015 09:03:02 +0800
+
 mkpxeinitrd-net (2.3.5-drbl1) unstable; urgency=low
 
   * Udevd from systemd 220-6 is now in /lib/systemd/systemd-udevd.
