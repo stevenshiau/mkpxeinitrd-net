@@ -62,7 +62,7 @@ usage() {
   echo "-nf, --no-all-firmwares 		Not to include all the firmwares, i.e. only the firmwares required by network card drivers will be copied."
   echo "-if, --include-all-firmwares 	Include all the firmwares"
   echo "-ns, --no-include-splash		Include the files and modules for splash"
-  echo "-h, --help				Show this messages"
+  echo "-h, --help				Show this message"
   echo 
   echo "Ex:"
   echo "$0 -k 2.6.32-5-686 -t initramfs -nf"
