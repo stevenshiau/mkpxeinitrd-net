@@ -159,7 +159,7 @@ if [ -e "$drbl_common_root/lib/modules/$kernel_ver/modules.pcimap" ]; then
   cp -f $drbl_common_root/lib/modules/$kernel_ver/modules.pcimap $initrd/etc
 fi
 
-# if we can find the modules in the common_root, use it first
+# If we can find the modules in the common_root, use it first
 if [ -d $drbl_common_root/lib/modules/$kernel_ver ]; then
    drbl_kernel_mod_path="$drbl_common_root/"
 else
