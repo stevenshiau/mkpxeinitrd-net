@@ -86,6 +86,7 @@ else if [ "$1" = "bound" ] ; then
     case "$nfs_prot_in_initrd" in
       nfs4) # NFS4
             # Start idmapd, in initrd only root account is available. Later we will stop rpc.idmapd before exiting initrd.
+            echo "Starting rpc.idmapd..."
             rpc.idmapd -U root &
             [ -n "$siaddr" ] || siaddr=$serverid
             [ -n "$rootpath" ] || rootpath="$siaddr:/$clientdir"
