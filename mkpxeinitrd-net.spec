@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.3.7
+Version: 2.3.8
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,6 +51,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Tue Dec 22 2015 Steven Shiau <steven _at_ nchc org tw> 2.3.8-drbl1
+- Minor updates for some comments and prompts.
+- The dependence for module-init-tools is now replaced by kmod.
+
 * Thu Jun 18 2015 Steven Shiau <steven _at_ nchc org tw> 2.3.7-drbl1
 - Suppress the error messages when starting systemd-udevd in linuxrc-or-init. Some kernel modules are intended to be not included in initramfs.
 

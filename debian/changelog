@@ -1,3 +1,10 @@
+mkpxeinitrd-net (2.3.8-drbl1) unstable; urgency=low
+
+  * Minor updates for some comments and prompts.
+  * The dependence for module-init-tools is now replaced by kmod.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Tue, 22 Dec 2015 21:31:57 +0800
+
 mkpxeinitrd-net (2.3.7-drbl1) unstable; urgency=low
 
   * Suppress the error messages when starting systemd-udevd in
