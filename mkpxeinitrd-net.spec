@@ -12,7 +12,7 @@ Group: System/Kernel and hardware
 URL: http://www.fensystems.co.uk/SRPMS.fensys
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
-Requires: coreutils, pciutils, module-init-tools, procps, drbl >= 2.15.14
+Requires: coreutils, pciutils, kmod, procps, drbl >= 2.15.14
 Obsoletes: mkinitrd-net
 ExclusiveArch: %{ix86}, x86_64
 
