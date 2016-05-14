@@ -218,7 +218,7 @@ rm -rf $RPM_BUILD_ROOT
 * Wed Mar 30 2011 Steven Shiau <steven _at_ nchc org tw> 1.5-12
 - New upstream busybox 1.18.4.
 
-* Tue Feb 16 2011 Steven Shiau <steven _at_ nchc org tw> 1.5-11
+* Wed Feb 16 2011 Steven Shiau <steven _at_ nchc org tw> 1.5-11
 - New upstream busybox 1.18.3.
 
 * Tue Oct 26 2010 Steven Shiau <steven _at_ nchc org tw> 1.5-10
@@ -427,7 +427,7 @@ rm -rf $RPM_BUILD_ROOT
 * Thu Nov 22 2007 Steven Shiau <steven _at_ nchc org tw> 1.2-18
 - New upstream busybox 1.8.1.
 
-* Sun Oct 27 2007 Steven Shiau <steven _at_ nchc org tw> 1.2-17
+* Sat Oct 27 2007 Steven Shiau <steven _at_ nchc org tw> 1.2-17
 - new upstream busybox 1.7.2.
 
 * Fri Sep 21 2007 Steven Shiau <steven _at_ nchc org tw> 1.2-16
@@ -467,7 +467,7 @@ rm -rf $RPM_BUILD_ROOT
 - Remounting dev at correct place in linuxrc-or-init both for initramfs and initrd, Uuse "mount --move -n /dev/ /sysroot/dev" instead of "mount -t tmpfs -n -o bind /dev/ /sysroot/dev"
 - add nr_inodes=24576 (mount -t tmpfs -n -o nr_inodes=24576,mode=0755 none /dev).
 
-* Fri Dec 16 2006 Steven Shiau <steven _at_ nchc org tw> 1.2-4
+* Sat Dec 16 2006 Steven Shiau <steven _at_ nchc org tw> 1.2-4
 - remove unnecessary pause in linuxrc-or-init.
 
 * Thu Dec 14 2006 Steven Shiau <steven _at_ nchc org tw> 1.2-3
@@ -502,13 +502,13 @@ rm -rf $RPM_BUILD_ROOT
 * Sun Oct 08 2006 Steven Shiau <steven _at_ nchc org tw> 1.1-21
 - comment some unnecessary codes in mkpxeinitrd-net.
 
-* Thu Oct 04 2006 Steven Shiau <steven _at_ nchc org tw> 1.1-20
+* Wed Oct 04 2006 Steven Shiau <steven _at_ nchc org tw> 1.1-20
 - bug fixed: kernel/net/packet should be copied to initrd for Debian based.
 
-* Thu Oct 04 2006 Steven Shiau <steven _at_ nchc org tw> 1.1-19
+* Wed Oct 04 2006 Steven Shiau <steven _at_ nchc org tw> 1.1-19
 - bug fixed: parse-nfs-mod is not installed in rpm/deb.
 
-* Wed Oct 03 2006 Steven Shiau <steven _at_ nchc org tw> 1.1-18
+* Tue Oct 03 2006 Steven Shiau <steven _at_ nchc org tw> 1.1-18
 - add parse-nfs-mod.
 - update mkpxeinitrd-net to work with newer nfs.ko in 2.6.17-2.6.18 (now it need fscache.ko), add we use parse-nfs-mod to get that.
 
@@ -587,5 +587,5 @@ rm -rf $RPM_BUILD_ROOT
 * Wed Feb 01 2006 Steven Shiau <steven _at_ nchc org tw> 1.0-2
 - update with busybox 1.1.0
 
-* Sat Oct 28 2005 Steven Shiau <steven _at_ nchc org tw> 1.0-1
+* Fri Oct 28 2005 Steven Shiau <steven _at_ nchc org tw> 1.0-1
 - rename the program as mkpxeinitrd-net, no more mkinitrd-net, to avoid confusion.
