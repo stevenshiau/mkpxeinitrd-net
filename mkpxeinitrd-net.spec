@@ -1,8 +1,8 @@
-%define BUSYBOX_VERSION 1.23.2
+%define BUSYBOX_VERSION 1.24.2
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.3.9
+Version: 2.3.10
 Release: drbl1
 Source0: %{name}-%{version}.tar.bz2
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,6 +51,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Sat May 14 2016 Steven Shiau <steven _at_ nchc org tw> 2.3.10-drbl1
+- Always include udev in initrd.
+- New upstream busybox 1.24.2.
+
 * Mon Jan 04 2016 Steven Shiau <steven _at_ nchc org tw> 2.3.9-drbl1
 - The dependence for kmod or module-init-tools is checked in drblsrv because RPM spec does not provide a way to deal with kmod or module-init-tools requirement. For newer GNU/Linux, kmod is required. However, for older system like CentOS 6, only module-init-tools exists.
 

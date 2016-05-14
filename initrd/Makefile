@@ -1,17 +1,8 @@
-BUSYBOX_VERSION = 1.23.2
+BUSYBOX_VERSION = 1.24.2
 BUSYBOX = busybox-$(BUSYBOX_VERSION)
 $(BUSYBOX)_SOURCE = http://www.busybox.net/downloads/$(BUSYBOX).tar.bz2
-
-#
-BUILD_NCPUS = $(shell egrep -c "^cpu[0-9]+" /proc/stat || :)
-if [ $(BUILD_NCPUS) -eq 0 ] ; then \
-    $(BUILD_NCPUS) = 1 \
-fi
-if [ $(BUILD_NCPUS) -gt 4 ] ; then \
-    $(BUILD_NCPUS) = 4 \
-fi
 SHELL := /bin/bash
-MP_OPT = -j $(BUILD_NCPUS)
+MP_OPT = -j 4
 
 all : utils initrd-skel
 

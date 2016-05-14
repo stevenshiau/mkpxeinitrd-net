@@ -1,3 +1,10 @@
+mkpxeinitrd-net (2.3.10-drbl1) unstable; urgency=medium
+
+  * Always include udev in initrd.
+  * New upstream busybox 1.24.2.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Sat, 14 May 2016 10:37:55 +0800
+
 mkpxeinitrd-net (2.3.9-drbl1) unstable; urgency=low
 
   * Sync the version number with RPM.
