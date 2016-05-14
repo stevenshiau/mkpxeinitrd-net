@@ -328,10 +328,8 @@ elif [ -n "$(echo $kernel_ver | grep -E "(^2\.6\.|^3\.|^4\.)")" ]; then
    done
 
    # Deal with firmwares!
-   # The following is borrowed from Debian's /usr/share/initramfs-tools/hook-functions
+   # The following is borrowed from Debian /usr/share/initramfs-tools/hook-functions
    if [ "$copy_all_firmwares" = "yes" ]; then
-     # In this case, this flag is on, since we need to call /usr/lib/mkpxeinitrd-net/hooks/udev later.
-     firmware_found_flag="yes"  
      # We want to include all the firmwares. This is useful when "modprobe -F firmware" shows nothing but actually some kernel modules (e.g. ipw2100 on Ubuntu 9.04) need firmware in /lib/firmware.
      if [ -n "$(unalias ls &>/dev/null; ls $drbl_kernel_mod_path/lib/firmware/* 2>/dev/null)" ]; then
        mkdir -p ${initrd}/lib/firmware
@@ -346,7 +344,6 @@ elif [ -n "$(echo $kernel_ver | grep -E "(^2\.6\.|^3\.|^4\.)")" ]; then
      fi
    else
      # We only include the firmwares reported by "modprobe -F firmware"
-     firmware_found_flag="no"
      echo "Trying to include network card firmwares if they exist in $drbl_kernel_mod_path/lib/firmware/..."
      for i in $net_mods; do
        mod="$initrd/lib/modules/$kernel_ver/$i"
@@ -360,7 +357,6 @@ elif [ -n "$(echo $kernel_ver | grep -E "(^2\.6\.|^3\.|^4\.)")" ]; then
        #   e100/d101s_ucode.bin
        #   e100/d101m_ucode.bin
        [ -z "$firmwares" ] && continue
-       firmware_found_flag="yes"
        for firmware in $firmwares; do
          #if [ -e "${initrd}/lib/firmware/${firmware}" ] \
          #|| [ -e "${initrd}/lib/firmware/${kernel_ver}/${firmware}" ]; then
@@ -425,19 +421,17 @@ elif [ -n "$(echo $kernel_ver | grep -E "(^2\.6\.|^3\.|^4\.)")" ]; then
      cp -a --parents extra/* $initrd/lib/modules/$kernel_ver/extra/
    fi
 
-   # If firmware_found_flag is "yes", we have to include udev, since without udev, firmware loading won't work.
-   if [ "$firmware_found_flag" = "yes" ]; then
-     mkdir -p $initrd/lib/udev
-     # The files could be /lib/udev/firmware.agent, /lib/udev/firmware.sh or /lib/udev/firmware (ubuntu 10.04)
-     for i in /lib/udev/*firmware*; do
-       [ ! -e "$i" ] && continue
-       copy_exec_not_link $i
-     done
-     # More files will be copied in /usr/lib/mkpxeinitrd-net/hooks/udev later
-     # The copy_exec_not_link in hooks/udev will honor variable DESTDIR
-     echo "Calling hook udev..."
-     /usr/lib/mkpxeinitrd-net/hooks/udev
-   fi
+   # Include udev which is a must for GNU/Linux system now
+   mkdir -p $initrd/lib/udev
+   # The files could be /lib/udev/firmware.agent, /lib/udev/firmware.sh or /lib/udev/firmware (ubuntu 10.04)
+   for i in /lib/udev/*firmware*; do
+     [ ! -e "$i" ] && continue
+     copy_exec_not_link $i
+   done
+   # More files will be copied in /usr/lib/mkpxeinitrd-net/hooks/udev later
+   # The copy_exec_not_link in hooks/udev will honor variable DESTDIR
+   echo "Calling hook udev..."
+   /usr/lib/mkpxeinitrd-net/hooks/udev
   )
 else 
   [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
