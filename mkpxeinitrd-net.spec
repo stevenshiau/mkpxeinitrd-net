@@ -2,9 +2,9 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.3.10
+Version: 2.3.11
 Release: drbl1
-Source0: %{name}-%{version}.tar.bz2
+Source0: %{name}-%{version}.tar.xz
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
 
 License: GPL
@@ -12,7 +12,7 @@ Group: System/Kernel and hardware
 URL: http://www.fensystems.co.uk/SRPMS.fensys
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
-Requires: coreutils, pciutils, procps, drbl >= 2.18.10
+Requires: coreutils, pciutils, procps, drbl >= 2.20.15
 Obsoletes: mkinitrd-net
 ExclusiveArch: %{ix86}, x86_64
 
@@ -51,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Mon Jun 06 2016 Steven Shiau <steven _at_ nchc org tw> 2.3.11-drbl1
+- Use xz format for drbl tarball for Debian.
+
 * Sat May 14 2016 Steven Shiau <steven _at_ nchc org tw> 2.3.10-drbl1
 - Always include udev in initrd.
 - New upstream busybox 1.24.2.

@@ -1,3 +1,9 @@
+mkpxeinitrd-net (2.3.11-drbl1) unstable; urgency=medium
+
+  * Use xz format for drbl tarball for Debian.
+
+ -- Steven Shiau <steven@nchc.org.tw>  Mon, 06 Jun 2016 12:07:50 +0800
+
 mkpxeinitrd-net (2.3.10-drbl1) unstable; urgency=medium
 
   * Always include udev in initrd.
