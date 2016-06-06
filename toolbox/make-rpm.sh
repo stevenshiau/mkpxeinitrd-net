@@ -31,12 +31,12 @@ BUSYBOX_VER="$(LC_ALL=C grep -Ew "^BUSYBOX_VERSION = .*" initrd/Makefile | awk -
 echo "BUSYBOX VER: $BUSYBOX_VER"
 
 #
-TARBALL="$PKG-$VER.tar.bz2"
+TARBALL="$PKG-$VER.tar.xz"
 
 #
 busybox_pkg="busybox-$BUSYBOX_VER.tar.bz2"
 busybox_cfg="busybox-$BUSYBOX_VER.config"
-mkinitrd_net_pkg="$PKG-$VER.tar.bz2"
+mkinitrd_net_pkg="$PKG-$VER.tar.xz"
 
 # check if pkg exists
 if [ ! -f "$busybox_pkg" ]; then

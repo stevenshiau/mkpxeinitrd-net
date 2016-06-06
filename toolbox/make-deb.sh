@@ -15,8 +15,8 @@ BUSYBOX_VER="$(LC_ALL=C grep -Ew "^BUSYBOX_VERSION = .*" initrd/Makefile | awk -
 echo "BUSYBOX VER: $BUSYBOX_VER"
 
 #
-TARBALL=$PKG-$VER.tar.bz2
-TARBALL_ORIG=${PKG}_${VER}.orig.tar.bz2
+TARBALL=$PKG-$VER.tar.xz
+TARBALL_ORIG=${PKG}_${VER}.orig.tar.xz
 busybox_pkg="busybox-$BUSYBOX_VER.tar.bz2"
 
 # check
@@ -26,7 +26,7 @@ busybox_pkg="busybox-$BUSYBOX_VER.tar.bz2"
 rm -rf debforge
 mkdir debforge
 (cd debforge; ln -fs ../$TARBALL $TARBALL_ORIG)
-tar -xjf $TARBALL -C debforge/
+tar -xJf $TARBALL -C debforge/
 # With Debian format 3.0, you can not put binary file in a package unless it's assigned by  debian/source/include-binaries.
 # The error messages:
 # dpkg-source: info: using source format `3.0 (quilt)'
