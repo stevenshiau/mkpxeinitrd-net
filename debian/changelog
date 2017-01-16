@@ -1,6 +1,20 @@
+mkpxeinitrd-net (2.4.1-drbl1) unstable; urgency=medium
+
+  * New upstream busybox 1.26.2.
+  * Add a mechanism to assign NFS root server IP address.
+    Priority for NFSroot server:
+    (1) If ipappend of syslinux is assigned, we use the bootp next server
+        shown in /proc/cmdline first.
+    (2) If grub mechanism is assigned (TOTO), we use that
+    (3) Use the one "nfsroot_srv_ip" assigned in /etc/linuxrc.conf
+    (4) Use the bootp next server, i.e., "siaddr" from environmental variable
+    (5) Use the DHCP server "serverid" 
+
+ -- Steven Shiau <steven@nchc.org.tw>  Mon, 16 Jan 2017 15:28:11 +0800
+
 mkpxeinitrd-net (2.3.11-drbl1) unstable; urgency=medium
 
-  * Use xz format for drbl tarball for Debian.
+  * Use xz format tarball for Debian.
 
  -- Steven Shiau <steven@nchc.org.tw>  Mon, 06 Jun 2016 12:07:50 +0800
 

@@ -1,8 +1,8 @@
-%define BUSYBOX_VERSION 1.24.2
+%define BUSYBOX_VERSION 1.26.2
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.3.11
+Version: 2.4.1
 Release: drbl1
 Source0: %{name}-%{version}.tar.xz
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,8 +51,19 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Mon Jan 16 2017 Steven Shiau <steven _at_ clonezilla org> 2.4.1-drbl1
+  - New upstream busybox 1.26.2.
+  - Add a mechanism to assign NFS root server IP address.
+    Priority for NFSroot server:
+    (1) If ipappend of syslinux is assigned, we use the bootp next server
+        shown in /proc/cmdline first.
+    (2) If grub mechanism is assigned (TOTO), we use that
+    (3) Use the one "nfsroot_srv_ip" assigned in /etc/linuxrc.conf
+    (4) Use the bootp next server, i.e., "siaddr" from environmental variable
+    (5) Use the DHCP server "serverid" 
+
 * Mon Jun 06 2016 Steven Shiau <steven _at_ nchc org tw> 2.3.11-drbl1
-- Use xz format for drbl tarball for Debian.
+- Use xz format tarball for Debian.
 
 * Sat May 14 2016 Steven Shiau <steven _at_ nchc org tw> 2.3.10-drbl1
 - Always include udev in initrd.
