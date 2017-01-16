@@ -13,6 +13,64 @@
 # Load setting
 . /etc/linuxrc.conf
 
+# Functions
+get_drbl_nfsroot(){
+  # Priority for NFSroot server
+  # (1) If ipappend of syslinux is assigned, we use the bootp next server shown in /proc/cmdline first.
+  #     Ref: http://www.syslinux.org/wiki/index.php?title=SYSLINUX
+  # (2) If grub mechanism is assigned (TOTO), we use that
+  # (3) Use the one "nfsroot_srv_ip" assigned in /etc/linuxrc.conf
+  # (4) Use the bootp next server, i.e. "siaddr" from environmental variable.
+  # (5) Use the DHCP server "serverid" 
+  # Ref: https://udhcp.busybox.net/README.udhcpc for (4) and (5).
+
+  # (1) ip=<client-ip>:<boot-server-ip>:<gw-ip>:<netmask> in /proc/cmdline
+  #     e.g., ip=192.168.1.1:192.168.1.254:192.168.1.254:255.255.255.0
+  nfsroot_srv="$(LC_ALL=C grep -Eo "ip=[[:digit:]\.:]+([[:space:]]|$)+" /proc/cmdline | sed -e "s/ip=//g" | cut -d":" -f2)"
+  if [ -n "$nfsroot_srv" ]; then
+    echo "NFS root: use the bootp next server found from PXELinux in /proc/cmdline: $nfsroot_srv"
+  fi
+
+  # (2) TODO: grub way
+  if [ -z "$nfsroot_srv" ]; then
+    nfsroot_srv="$(LC_ALL=C grep -Eo "drbl_bootp=[[:digit:]\.]+([[:space:]]|$)+" /proc/cmdline | cut -d"=" -f2)"
+    if [ -n "$nfsroot_srv" ]; then
+      echo "NFS root: use the bootp next server found from Grub in /proc/cmdline: $nfsroot_srv"
+    fi
+  fi
+
+  # (3) Use nfsroot_srv_ip from /etc/linuxrc.conf
+  if [ -z "$nfsroot_srv" ]; then
+     if [ -n "$nfsroot_srv_ip" ]; then
+       echo "NFS root: use the NFS root server assigned in /etc/linuxrc.conf."
+       nfsroot_srv="$nfsroot_srv_ip"
+     fi
+  fi
+
+  # (4) Use bootp next server "siaddr"
+  if [ -z "$nfsroot_srv" ]; then
+     if [ -n "$siaddr" ]; then
+       echo "NFS root: use the bootp next server assigned from DHCP server."
+       nfsroot_srv="$siaddr"
+     fi
+  fi
+
+  # (5) Use DHCP server "serverid"
+  if [ -z "$nfsroot_srv" ]; then
+     if [ -n "$serverid" ]; then
+       echo "NFS root: use the DHCP server."
+       nfsroot_srv="$serverid"
+     fi
+  fi
+
+  if [ -z "$nfsroot_srv" ]; then
+     echo "*****************************************"
+     echo "DRBL NFS root server IP address NOT found!"
+     echo "*****************************************"
+     echo "Program terminated!"
+     exit 1
+  fi
+} # end of get_drbl_nfsroot
 #
 #RWSIZE_OPT="rsize=65536,wsize=65536"
 RWSIZE_OPT=""
@@ -83,24 +141,22 @@ else if [ "$1" = "bound" ] ; then
     for i in $dns; do
       echo nameserver $i >> /etc/resolv.conf
     done
+    get_drbl_nfsroot  # Obtain $nfsroot_srv
     case "$nfs_prot_in_initrd" in
       nfs4) # NFS4
             # Start idmapd, in initrd only root account is available. Later we will stop rpc.idmapd before exiting initrd.
             echo "Starting rpc.idmapd..."
             rpc.idmapd -U root &
-            [ -n "$siaddr" ] || siaddr=$serverid
-            [ -n "$rootpath" ] || rootpath="$siaddr:/$clientdir"
+            [ -z "$rootpath" ] && rootpath="$nfsroot_srv:/$clientdir"
 	    ;;
          *) # NFS3
-            [ -n "$siaddr" ] || siaddr=$serverid
-            [ -n "$rootpath" ] || rootpath="$siaddr:/tftpboot/$clientdir"
+            [ -z "$rootpath" ] && rootpath="$nfsroot_srv:/tftpboot/$clientdir"
 	    ;;
     esac
     # erase the space
     rootpath_=`echo $rootpath | sed -e "s/ //g"`
     rootpath="$rootpath_"
-    # erase the space
-    echo "rootpath= $rootpath"
+    echo "rootpath=$rootpath"
     echo "Mounting root filesystem $rootpath at /sysroot..."
     echo "If this appears to hang, check"
     kernel_ver=`uname -r`
