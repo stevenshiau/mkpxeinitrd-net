@@ -8,7 +8,7 @@ Standards-Version: 3.9.3
 Homepage: http://drbl.org/
 
 Package: mkpxeinitrd-net
-Architecture: i386 amd64
+Architecture: i386 amd64 arm64
 Depends: ${shlibs:Depends}, ${misc:Depends}, coreutils, pciutils, kmod, procps, drbl (>= 2.18.10)
 Description: Build initial ramdisk images for DRBL clients
  mkpxeinitrd-net is a derived program from mkinitrd-net.

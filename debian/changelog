@@ -1,3 +1,12 @@
+mkpxeinitrd-net (2.4.2-drbl1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * New upstream busybox 1.27.2.
+  * Disable the support for Linux kernel 2.2/2.4 module utility.
+    It does not support ARM64.
+
+ -- Steven Shiau <steven@clonezilla.org>  Mon, 20 Nov 2017 15:29:12 +0800
+
 mkpxeinitrd-net (2.4.1-drbl1) unstable; urgency=medium
 
   * New upstream busybox 1.26.2.

@@ -1,8 +1,8 @@
-%define BUSYBOX_VERSION 1.26.2
+%define BUSYBOX_VERSION 1.27.2
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.4.1
+Version: 2.4.2
 Release: drbl1
 Source0: %{name}-%{version}.tar.xz
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,6 +51,11 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Mon Nov 20 2017 Steven Shiau <steven _at_ clonezilla org> 2.4.2-drbl1
+  - New upstream busybox 1.27.2.
+  - Disable the support for Linux kernel 2.2/2.4 module utility.
+    It does not support ARM64.
+
 * Mon Jan 16 2017 Steven Shiau <steven _at_ clonezilla org> 2.4.1-drbl1
   - New upstream busybox 1.26.2.
   - Add a mechanism to assign NFS root server IP address.
