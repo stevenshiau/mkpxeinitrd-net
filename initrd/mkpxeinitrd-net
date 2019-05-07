@@ -268,7 +268,7 @@ if [ -n "$(echo $kernel_ver | grep "^2\.4\.")" ]; then
   # for kernel 2.4.x, we use this ugly method, since tar has "--exclude" option
   # And we just exclude wireless, ignore the option include_wireless_modules
   (cd $drbl_kernel_mod_path/lib/modules/$kernel_ver && tar cplf - modules.*  kernel/net/sunrpc* kernel/fs/nfs* kernel/fs/lockd* kernel/net/packet kernel/drivers/net kernel/drivers/base kernel/lib --exclude appletalk --exclude fc --exclude hamradio --exclude irda --exclude pcmcia --exclude tokenring --exclude wan --exclude wireless --exclude wireless_old 2>/dev/null) | ( cd $initrd/lib/modules/$kernel_ver && tar xpf -)
-elif [ -n "$(echo $kernel_ver | grep -E "(^2\.6\.|^3\.|^4\.)")" ]; then
+elif [ -n "$(echo $kernel_ver | grep -E "(^2\.6\.|^3\.|^4\.|^5\.)")" ]; then
   # for kernel 2.6.x, we have better method	 
   (
    cd $drbl_kernel_mod_path/lib/modules/$kernel_ver/
