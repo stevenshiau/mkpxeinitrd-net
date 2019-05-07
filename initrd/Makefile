@@ -1,4 +1,4 @@
-BUSYBOX_VERSION = 1.28.4
+BUSYBOX_VERSION = 1.30.1
 BUSYBOX = busybox-$(BUSYBOX_VERSION)
 $(BUSYBOX)_SOURCE = http://www.busybox.net/downloads/$(BUSYBOX).tar.bz2
 SHELL := /bin/bash
