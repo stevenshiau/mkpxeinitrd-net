@@ -196,9 +196,9 @@ if [ -n "$initfs_type" ]; then
      fi
      initfs_type="CRAMFS" ;;
    initramfs|INITRAMFS) 
-     if [ -z "$(echo "$kernel_ver" | grep -E "(^2\.6\.|^3\.|^3\.|^4\.)")" ]; then
+     if [ -z "$(echo "$kernel_ver" | grep -E "(^2\.6\.|^3\.|^4\.|^5\.)")" ]; then
        [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
-       echo "Program mkpxeinitrd-net only works for kernel 2.6, 3 or 4!"
+       echo "Program mkpxeinitrd-net only works for kernel 2.6, 3, 4 or 5!"
        [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
        echo "Program terminated!!!"
        exit 1
@@ -215,9 +215,9 @@ else
     echo "I can not judge either filesystem CRAMFS or EXT2 is builtin (NOT module) in the kernel you are using!!!"
     echo "We will assume that the kernel you are using can use initramfs!"
     [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
-    if [ -z "$(echo "$kernel_ver" | grep -E "(^2\.6\.|^3\.|^3\.|^4\.)")" ]; then
+    if [ -z "$(echo "$kernel_ver" | grep -E "(^2\.6\.|^3\.|^4\.|^5\.)")" ]; then
       [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
-      echo "Program mkpxeinitrd-net only works for kernel 2.6, 3 or 4!"
+      echo "Program mkpxeinitrd-net only works for kernel 2.6, 3, 4 or 5!"
       [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
       echo "Program terminated!!!"
       exit 1
@@ -228,9 +228,9 @@ else
     [ -n "$(grep "^CONFIG_CRAMFS=y" $kernel_config)" ] && initfs_type="CRAMFS"
     [ -n "$(grep "^CONFIG_EXT2_FS=y" $kernel_config)" ] && initfs_type="EXT2"
     if [ -z "$initfs_type" ]; then
-      if [ -z "$(echo "$kernel_ver" | grep -E "(^2\.6\.|^3\.|^3\.|^4\.)")" ]; then
+      if [ -z "$(echo "$kernel_ver" | grep -E "(^2\.6\.|^3\.|^4\.|^5\.)")" ]; then
         [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
-        echo "Program mkpxeinitrd-net only works for kernel 2.6, 3 or 4!"
+        echo "Program mkpxeinitrd-net only works for kernel 2.6, 3, 4 or 5!"
         [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
         echo "Program terminated!!!"
         exit 1
