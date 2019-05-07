@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.5.1
+Version: 2.5.2
 Release: drbl1
 Source0: %{name}-%{version}.tar.xz
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,6 +51,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Tue May 07 2019 Steven Shiau <steven _at_ clonezilla org> 2.5.2-drbl1
+  * Bug fixed: Allow mkpxeinitrd-net works for Linux kernel 5,
+    need to fix one more part.
+
 * Tue May 07 2019 Steven Shiau <steven _at_ clonezilla org> 2.5.1-drbl1
   * Allow mkpxeinitrd-net works for Linux kernel 5.
   * New upstream busybox 1.30.1.

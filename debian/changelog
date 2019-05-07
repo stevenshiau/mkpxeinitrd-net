@@ -1,3 +1,10 @@
+mkpxeinitrd-net (2.5.2-drbl1) unstable; urgency=medium
+
+  * Bug fixed: Allow mkpxeinitrd-net works for Linux kernel 5,
+    need to fix one more part.
+
+ -- Steven Shiau <steven@clonezilla.org>  Tue, 07 May 2019 15:05:55 +0800
+
 mkpxeinitrd-net (2.5.1-drbl1) unstable; urgency=medium
 
   * Allow mkpxeinitrd-net works for Linux kernel 5.
