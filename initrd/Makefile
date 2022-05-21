@@ -1,8 +1,8 @@
-BUSYBOX_VERSION = 1.30.1
+BUSYBOX_VERSION = 1.35.0
 BUSYBOX = busybox-$(BUSYBOX_VERSION)
 $(BUSYBOX)_SOURCE = http://www.busybox.net/downloads/$(BUSYBOX).tar.bz2
 SHELL := /bin/bash
-MP_OPT = -j 4
+MP_OPT = -j 6
 
 all : utils initrd-skel
 

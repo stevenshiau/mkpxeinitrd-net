@@ -1,8 +1,8 @@
-%define BUSYBOX_VERSION 1.30.1
+%define BUSYBOX_VERSION 1.35.0
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.5.2
+Version: 2.5.3
 Release: drbl1
 Source0: %{name}-%{version}.tar.xz
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,6 +51,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Sat May 21 2021 Steven Shiau <steven _at_ clonezilla org> 2.5.3-drbl1
+  * Remove the warning color about is CRAMFS or ext2 file system.
+  * New upstream busybox 1.35.0.
+
 * Tue May 07 2019 Steven Shiau <steven _at_ clonezilla org> 2.5.2-drbl1
   * Bug fixed: Allow mkpxeinitrd-net works for Linux kernel 5,
     need to fix one more part.

@@ -235,9 +235,7 @@ else
         echo "Program terminated!!!"
         exit 1
       fi
-      [ "$BOOTUP" = "color" ] && $SETCOLOR_WARNING
       echo "$kernel_config is found but either CRAMFS or EXT2 filesystem is NOT builtin in the kernel. We will use initramfs."
-      [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
       initfs_type="INITRAMFS"
     fi
   fi

@@ -1,3 +1,10 @@
+mkpxeinitrd-net (2.5.3-drbl1) unstable; urgency=medium
+
+  * Remove the warning color about is CRAMFS or ext2 file system.
+  * New upstream busybox 1.35.0.
+
+ -- Steven Shiau <steven@clonezilla.org>  Sat, 21 May 2022 10:07:11 +0800
+
 mkpxeinitrd-net (2.5.2-drbl1) unstable; urgency=medium
 
   * Bug fixed: Allow mkpxeinitrd-net works for Linux kernel 5,
