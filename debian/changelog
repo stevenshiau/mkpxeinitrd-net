@@ -1,3 +1,9 @@
+mkpxeinitrd-net (2.5.4-drbl1) unstable; urgency=medium
+
+  * mkpxeinitrd-net: accept Linux kernel v6.
+
+ -- Steven Shiau <steven@clonezilla.org>  Sat, 26 Nov 2022 15:59:21 +0800
+
 mkpxeinitrd-net (2.5.3-drbl1) unstable; urgency=medium
 
   * Remove the warning color about is CRAMFS or ext2 file system.
