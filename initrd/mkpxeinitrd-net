@@ -160,7 +160,7 @@ if [ -e "$drbl_common_root/lib/modules/$kernel_ver/modules.pcimap" ]; then
 fi
 
 # If we can find the modules in the common_root, use it first
-if [ -d $drbl_common_root/lib/modules/$kernel_ver ]; then
+if [ -d "$drbl_common_root/lib/modules/$kernel_ver" ]; then
    drbl_kernel_mod_path="$drbl_common_root/"
 else
    drbl_kernel_mod_path=""
@@ -170,7 +170,17 @@ echo "Use kernel modules from $drbl_kernel_mod_path/lib/modules/$kernel_ver."
 # check if /boot/config-$kernel_ver exists
 # By Blake Huang, modified by Steven Shiau.
 # kernel config is either in /boot/ or /tftpboot/node_root/boot
-kernel_config="$drbl_kernel_mod_path/lib/modules/../../boot/config-$kernel_ver"
+if [ -e "$drbl_kernel_mod_path/lib/modules/../../boot/config-$kernel_ver" ]; then
+  kernel_config="$drbl_kernel_mod_path/lib/modules/../../boot/config-$kernel_ver"
+elif [ -e "$drbl_kernel_mod_path/lib/modules/../../../boot/config-$kernel_ver" ]; then
+  kernel_config="$drbl_kernel_mod_path/lib/modules/../../../boot/config-$kernel_ver"
+else
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
+  echo "Kernel config file \"config-$kernel_ver\" not found in $drbl_kernel_mod_path/boot."
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+  echo "Program terminated!!!"
+  exit 1
+fi
 
 # decided the initfs type
 if [ -n "$initfs_type" ]; then
