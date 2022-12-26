@@ -1,3 +1,10 @@
+mkpxeinitrd-net (2.5.6-drbl1) unstable; urgency=medium
+
+  * Bug fixed: support /lib is linked to /usr/lib/.
+    Thanks to Dr. Yu for reporting this.
+
+ -- Steven Shiau <steven@clonezilla.org>  Mon, 26 Dec 2022 22:13:20 +0800
+
 mkpxeinitrd-net (2.5.5-drbl1) unstable; urgency=medium
 
   * Bug fixed: support Linux kernel 6.0.

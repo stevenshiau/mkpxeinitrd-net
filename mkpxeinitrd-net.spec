@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.5.5
+Version: 2.5.6
 Release: drbl1
 Source0: %{name}-%{version}.tar.xz
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,10 +51,14 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
-* Sat Nov 26 2021 Steven Shiau <steven _at_ clonezilla org> 2.5.5-drbl1
+* Mon Dec 26 2022 Steven Shiau <steven _at_ clonezilla org> 2.5.6-drbl1
+  * Bug fixed: support /lib is linked to /usr/lib/.
+    Thanks to Dr. Yu for reporting this.
+
+* Sat Nov 26 2022 Steven Shiau <steven _at_ clonezilla org> 2.5.5-drbl1
   * Bug fixed: support Linux kernel 6.0.
 
-* Sat Nov 26 2021 Steven Shiau <steven _at_ clonezilla org> 2.5.4-drbl1
+* Sat Nov 26 2022 Steven Shiau <steven _at_ clonezilla org> 2.5.4-drbl1
   * mkpxeinitrd-net: accept Linux kernel v6.
 
 * Sat May 21 2021 Steven Shiau <steven _at_ clonezilla org> 2.5.3-drbl1
