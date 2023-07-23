@@ -1,8 +1,8 @@
-%define BUSYBOX_VERSION 1.35.0
+%define BUSYBOX_VERSION 1.36.0
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.5.6
+Version: 2.5.7
 Release: drbl1
 Source0: %{name}-%{version}.tar.xz
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,6 +51,11 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Sun Jul 23 2023 Steven Shiau <steven _at_ clonezilla org> 2.5.7-drbl1
+  * New upstream busybox 1.36.0.
+  * Use "chroot root:root" instead of "chroot root.root" in
+    initrd/mkpxeinitrd-net.
+
 * Mon Dec 26 2022 Steven Shiau <steven _at_ clonezilla org> 2.5.6-drbl1
   * Bug fixed: support /lib is linked to /usr/lib/.
     Thanks to Dr. Yu for reporting this.

@@ -489,7 +489,7 @@ for i in $include_bin_prog_from_server; do
     [ "$verbose" = "-v" ] && echo "Including $i in the PXE initrd..."
     copy_exec_not_link $(which $i) /bin/
     # Make sure the owner is root, otherwise the error "mount: only root can do that (effective UID is xxxxxx)" might occur.
-    chown root.root $DESTDIR/bin/$i
+    chown root:root $DESTDIR/bin/$i
   fi
 done
 

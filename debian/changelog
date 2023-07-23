@@ -1,3 +1,11 @@
+mkpxeinitrd-net (2.5.7-drbl1) unstable; urgency=medium
+
+  * New upstream busybox 1.36.0.
+  * Use "chroot root:root" instead of "chroot root.root" in
+    initrd/mkpxeinitrd-net.
+
+ -- Steven Shiau <steven@clonezilla.org>  Sun, 23 Jul 2023 16:44:23 +0800
+
 mkpxeinitrd-net (2.5.6-drbl1) unstable; urgency=medium
 
   * Bug fixed: support /lib is linked to /usr/lib/.
