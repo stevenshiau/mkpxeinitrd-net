@@ -2,7 +2,7 @@
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.5.7
+Version: 2.5.8
 Release: drbl1
 Source0: %{name}-%{version}.tar.xz
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -51,6 +51,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Thu Jul 27 2023 Steven Shiau <steven _at_ clonezilla org> 2.5.8-drbl1
+  * Use "sleep 1" instead of "sleep 0.1" which won't work for busybox,
+    although we have included a sleep supporting it.
+
 * Sun Jul 23 2023 Steven Shiau <steven _at_ clonezilla org> 2.5.7-drbl1
   * New upstream busybox 1.36.0.
   * Use "chroot root:root" instead of "chroot root.root" in

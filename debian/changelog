@@ -1,3 +1,10 @@
+mkpxeinitrd-net (2.5.8-drbl1) unstable; urgency=medium
+
+  * Use "sleep 1" instead of "sleep 0.1" which won't work for busybox,
+    although we have included a sleep supporting it.
+
+ -- Steven Shiau <steven@clonezilla.org>  Thu, 27 Jul 2023 10:33:52 +0800
+
 mkpxeinitrd-net (2.5.7-drbl1) unstable; urgency=medium
 
   * New upstream busybox 1.36.0.
