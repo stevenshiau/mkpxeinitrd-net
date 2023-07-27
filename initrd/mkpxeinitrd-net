@@ -37,7 +37,7 @@ copy_all_firmwares="no"
 include_splash="yes"
 # uncompress the compress kernel module. This is special for Mandriva case. It uses compressed kernel module, e.g. pcnet32.ko.gz. Before we used modprobe from busybox, we have to uncompress that. Now the modprobe program is from the OS (See variable include_bin_prog_from_server), so we should allow this type of kernel modules.
 use_compressed_kernel_module="yes"
-# Some required bin programs to be included in the PXE initrd, which are not provided by busybox or the one provided by busybox does not support the function we want. E.g. sleep (we need "sleep 0.1", while sleep from busybox does not support 0.1 secs).
+# Some required bin programs to be included in the PXE initrd, which are not provided by busybox or the one provided by busybox does not support the function we want. E.g. sleep (If we need "sleep 0.1", while sleep from busybox does not support 0.1 secs).
 include_bin_prog_from_server="sleep lspci insmod modprobe rmmod lsmod pkill strings mount umount mount.nfs umount.nfs"
 # For nfs4, we need more programs
 if [ "$drbl_nfs_prot"="nfs4" ]; then

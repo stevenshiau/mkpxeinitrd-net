@@ -188,8 +188,7 @@ if [ -z "$netdevices" ]; then
     echo -n "Waiting for $i to be linked..."
     while [ -z "$(grep "1" /sys/class/net/$i/carrier 2>/dev/null)" ]; do
       echo -n "."
-      # decrease 0.1 secs
-      sleep 0.1
+      sleep 1
       link_detect_timeout=$(( $link_detect_timeout - 1 ))
       if [ $link_detect_timeout -le 0 ]; then
         echo "Time out!"
