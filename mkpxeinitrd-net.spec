@@ -1,8 +1,8 @@
-%define BUSYBOX_VERSION 1.36.0
+%define BUSYBOX_VERSION 1.36.1
 %define _libdir /usr/lib/
 Summary: PXE Network-booting initrd builder
 Name: mkpxeinitrd-net
-Version: 2.5.8
+Version: 2.5.9
 Release: drbl1
 Source0: %{name}-%{version}.tar.xz
 Source1: http://www.busybox.net/downloads/busybox-%{BUSYBOX_VERSION}.tar.bz2
@@ -13,7 +13,6 @@ URL: http://www.fensystems.co.uk/SRPMS.fensys
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
 Requires: coreutils, pciutils, procps, drbl >= 2.20.15
-Obsoletes: mkinitrd-net
 ExclusiveArch: %{ix86}, x86_64
 
 %description
@@ -51,6 +50,13 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS.busybox LICENSE.busybox COPYING CHANGES
 
 %changelog
+* Sat Sep 14 2024 Steven Shiau <steven _at_ clonezilla org> 2.5.9-drbl1
+  * Linux kernel modules might be in zstd format. Hence parse-net-mod &
+    parse-nfs-mod have to be improved to accept that format.
+  * Newer Busybox 1.36.1 was used. Disable the support
+    of mounting NFS file systems on Linux < 2.6.23
+    (CONFIG_FEATURE_MOUNT_NFS).
+
 * Thu Jul 27 2023 Steven Shiau <steven _at_ clonezilla org> 2.5.8-drbl1
   * Use "sleep 1" instead of "sleep 0.1" which won't work for busybox,
     although we have included a sleep supporting it.
@@ -70,7 +76,7 @@ rm -rf $RPM_BUILD_ROOT
 * Sat Nov 26 2022 Steven Shiau <steven _at_ clonezilla org> 2.5.4-drbl1
   * mkpxeinitrd-net: accept Linux kernel v6.
 
-* Sat May 21 2021 Steven Shiau <steven _at_ clonezilla org> 2.5.3-drbl1
+* Fri May 21 2021 Steven Shiau <steven _at_ clonezilla org> 2.5.3-drbl1
   * Remove the warning color about is CRAMFS or ext2 file system.
   * New upstream busybox 1.35.0.
 

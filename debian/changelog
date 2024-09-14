@@ -1,3 +1,13 @@
+mkpxeinitrd-net (2.5.9-drbl1) unstable; urgency=medium
+
+  * Linux kernel modules might be in zstd format. Hence parse-net-mod &
+    parse-nfs-mod have to be improved to accept that format.
+  * Newer Busybox 1.36.1 was used. Disable the support
+    of mounting NFS file systems on Linux < 2.6.23
+    (CONFIG_FEATURE_MOUNT_NFS).
+
+ -- Steven Shiau <steven@clonezilla.org>  Sat, 14 Sep 2024 12:33:29 +0800
+
 mkpxeinitrd-net (2.5.8-drbl1) unstable; urgency=medium
 
   * Use "sleep 1" instead of "sleep 0.1" which won't work for busybox,
