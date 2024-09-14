@@ -59,7 +59,7 @@ else
 fi
 
 # Regure expression to grep the nfs.ko
-net_mod_reg="^$net_mod_path/.*\.ko(\.gz|\.xz)*:"
+net_mod_reg="^$net_mod_path/.*\.ko(\.gz|\.xz|\.zst)*:"
 
 exclude_list="appletalk fc hamradio irda pcmcia tokenring wan irda"
 if [ "$include_wireless_modules" = "no" ]; then
