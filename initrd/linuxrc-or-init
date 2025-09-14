@@ -82,8 +82,8 @@ fi
 # /dev/
 # We only will start udevd when it supports daemon mode. Otherwise like the udevd in CentOS 4.8, it will hang.
 udevd_prog=
-if [ -e /sbin/udevd ]; then
-  udevd_prog=/sbin/udevd
+if [ -e /usr/sbin/udevd ]; then
+  udevd_prog=/usr/sbin/udevd
 elif [ -e /usr/lib/systemd/systemd-udevd ]; then
   udevd_prog=/usr/lib/systemd/systemd-udevd
 elif [ -e /lib/systemd/systemd-udevd ]; then
@@ -121,7 +121,7 @@ if [ "$start_udevd" = "yes" ]; then
   
   # Start the udev daemon to process events
   resolve_name_opt=""
-  # Instead of using "/sbin/udevd --help", we use strings here. 
+  # Instead of using "/usr/sbin/udevd --help", we use strings here. 
   # This workaround is to avoid this weird case:
   # http://sourceforge.net/projects/drbl/forums/forum/394007/topic/3729074
   if [ -n "$(LC_ALL=C strings $udevd_prog 2>/dev/null | grep -- "--resolve-names")" ]; then
@@ -132,9 +132,9 @@ if [ "$start_udevd" = "yes" ]; then
   # Iterate sysfs and fire off everything; if we include a rule for it then
   # it'll get handled; otherwise it'll get handled later when we do this again
   # in the main boot sequence.
-  if [ -x /sbin/udevadm ]; then
-    ( /sbin/udevadm trigger --subsystem-match=block 2>/dev/null; \
-      /sbin/udevadm trigger --subsystem-nomatch=block 2>/dev/null; ) &
+  if [ -x /usr/sbin/udevadm ]; then
+    ( /usr/sbin/udevadm trigger --subsystem-match=block 2>/dev/null; \
+      /usr/sbin/udevadm trigger --subsystem-nomatch=block 2>/dev/null; ) &
   fi
 else
   # Manually create dev files first. Later actually it will change to the dev system from GNU/Linux system.
@@ -148,10 +148,10 @@ else
 fi
 
 # splash. Borrowed from Ubuntu 9.10
-if grep -iq splash /proc/cmdline && [ -x /sbin/usplash ]; then
-  #/sbin/usplash -c -t 60 --background --pidfile usplash.pid
+if grep -iq splash /proc/cmdline && [ -x /usr/sbin/usplash ]; then
+  #/usr/sbin/usplash -c -t 60 --background --pidfile usplash.pid
   # //NOTE// The above fails in DRBL client, no idea why... Hence we use "&" to run it in the background
-  /sbin/usplash -c -t 60 &
+  /usr/sbin/usplash -c -t 60 &
 fi
 
 echo 0x100 > /proc/sys/kernel/real-root-dev
@@ -161,9 +161,9 @@ echo > /dev/resolv.conf
 
 $echo "Loading network device modules..."
 if [ -z "$quiet" ]; then
-  /bin/insert-modules
+  /usr/bin/insert-modules
 else
-  /bin/insert-modules >/dev/null 2>&1
+  /usr/bin/insert-modules >/dev/null 2>&1
 fi
 
 $echo "Bringing up loopback interface"
@@ -224,7 +224,7 @@ for device in $netdevices; do
   while [ "$iretry" -lt "$iretry_max" ]; do
     iretry=$(($iretry+1))
     echo "Leasing IP address via [$device]. Try $iretry..."
-    udhcpc -i $device -f --clientid-none --vendorclass="$vendor_class_id" $udhcpc_port_opt -n -q -s /bin/udhcpc-post
+    udhcpc -i $device -f --clientid-none --vendorclass="$vendor_class_id" $udhcpc_port_opt -n -q -s /usr/bin/udhcpc-post
     # We use the writable dir /dev/ to store the sname, and sname will be removed when it's not used anymore.
     [ -f "/dev/sname" ] && servername=`cat /dev/sname`
     # Do we want to check server name ?
@@ -285,25 +285,23 @@ if [ -d /sysroot/initrd ]; then
 
   if mountpoint /run 2>/dev/null 1>&2; then
     $echo "Unmounting /run prior to pivot_root or switch_root"
-    #mount --move -n /run/ /sysroot/run
     umount -n -l /run 2>/dev/null
   fi
 
   $echo "Remounting dev at correct place"
   # No more devfs, we use tmpfs and tarball dev (created in drblsrv) or udev
-  #mount -t tmpfs -n -o bind /dev/ /sysroot/dev
   mount --move -n /dev/ /sysroot/dev
 
   if [ "$initfs_type" = "initramfs" ]; then
     echo "Use switch_root to exit initramfs"
     echo "Finished busybox $initfile! Enter DRBL init!"
-    exec switch_root -c /dev/console /sysroot /sbin/init
+    exec switch_root -c /dev/console /sysroot /usr/sbin/init
   else
     echo "Use pivot_root to exit initrd"
     $echo "Pivoting root to /sysroot"
     pivot_root /sysroot /sysroot/initrd
     # From now on, original files in initrd are in /sysroot/initrd/ 
-    # (Ex: /sysroot/initrd/bin/busybox), and 
+    # (Ex: /sysroot/initrd/usr/bin/busybox), and 
     # / is mounted from $NFSSERVER:/tftpboot/node_root/
     cd /
     

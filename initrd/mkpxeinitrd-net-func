@@ -1,10 +1,11 @@
 #!/bin/bash
 # -*-Shell-script-*-
-# Function copy_exec_not_link is borrowed from copy_exec from Debian's package initramfs-tools: /usr/share/initramfs-tools/hook-functions. The difference is that we use "cp -pL" instead of "ln -fs" in this function. This is because when we run mkpxeinitrd-net, we run cpio without "--dereference" (mkinitramfs uses cpio with "--dereference"), i.e. in mkpxeinitrd-net, we use:
+# Function copy_exec_not_link is borrowed from copy_exec from Debian's package initramfs-tools: /usr/share/initramfs-tools/hook-functions. 
  # find . | cpio --quiet -o -H newc | gzip -9 > $output_dir/initrd-$initrd_suffix.$kernel_ver.img )
  # instead of
  # find . | cpio --quiet --dereference -o -H newc | gzip -9 > $output_dir/initrd-$initrd_suffix.$kernel_ver.img )
- # The reason to do so is we use symbolic link to link the command to busybox in/usr/lib/mkpxeinitrd-net/initrd-skel/bin/. If we use --dereference, it will take a lot of space. This might be improved in the future.
+ # The reason to do so is we use symbolic link to link the command to busybox in /usr/lib/mkpxeinitrd-net/initrd-skel/usr/bin/.
+ # If we use --dereference, it will take a lot of space.
  
 # $1 is the source path (e.g. /usr/bin/time)
 # $2 is the relative destination (e.g. /usr or /usr/time)
@@ -20,64 +21,159 @@
 #
 #   "copy_exec_not_link /usr/bin/time"             -> /usr/bin/time
 #
+
+# Copy a file to the initramfs:
+# $1 = file type, for debug logging
+# $2 = source file name
+# $3 (optional) = target file or directory name in the initramfs
+#
+# * If the target is not specified, it defaults to the source file
+#   name.
+# * If the target is specified and exists as a directory under
+#   $DESTDIR or ends in a slash, the basename of the source is
+#   appended to it.
+#
+# The target file's containing directories are created if necessary.
+#
+# If the source file name includes a symlink, other than usr-merge
+# symlinks, and the canonical name of the source is not the same as
+# the target, the source file is copied to its canonical name in the
+# initramfs and the target is created as a symlink.
+#
+# Returns:
+# * If the file was copied successfully, 0
+# * If the target file already existed, 1
+# * On error, >1
+verbose=n
+copy_file() {
+	local type src target link_target
+
+	type="${1}"
+	src="${2}"
+	target="${3:-$2}"
+
+	[ -f "${src}" ] || return 2
+
+	if [ -d "${DESTDIR}/${target}" ] || [ "${target%/}" != "$target" ]; then
+		target="${target}/${src##*/}"
+	fi
+
+	# Canonicalise target to be absolute, so the comparisons below
+	# will work
+	target="$(realpath -ms "/${target}")" || return 2
+
+	# Canonicalise usr-merged directories
+	case "${src}" in
+	/bin/* | /lib* | /sbin/*)
+		[ "$(readlink -f /bin)" = /usr/bin ] && src="/usr${src}"
+		;;
+	esac
+	case "${target}" in
+	/bin/* | /lib* | /sbin/*) target="/usr${target}" ;;
+	esac
+
+	# check if already copied
+	[ -e "${DESTDIR}/${target}" ] && return 1
+
+	mkdir -p "${DESTDIR}/${target%/*}"
+
+	# Check whether source or one of its ancestors is a symlink.
+	# If so, copy the symlink target and make the target a symlink
+	# too.  We don't need to replicate a chain of links completely;
+	# just link directly to the ultimate target.
+	link_target="$(readlink -f "${src}")" || return $(($? + 1))
+	if [ "${link_target}" != "$(realpath -s "$src")" ]; then
+		# Update source for the copy
+		src="${link_target}"
+
+		# Canonicalise usr-merged target directories
+		case "${link_target}" in
+		/bin/* | /lib* | /sbin/*) link_target="/usr${link_target}" ;;
+		esac
+
+		if [ "${link_target}" != "${target}" ]; then
+			[ "${verbose?}" = "y" ] && echo "Adding ${type}-link ${target}"
+
+			# Copy the file so it always points
+			# to the right place
+			ln -rs "${DESTDIR}/${link_target}" "${DESTDIR}/${target}"
+		fi
+
+		# Copy the link target if it doesn't already exist
+		target="${link_target}"
+		[ -e "${DESTDIR}/${target}" ] && return 0
+		mkdir -p "${DESTDIR}/${target%/*}"
+	fi
+
+	[ "${verbose}" = "y" ] && echo "Adding ${type} ${src}"
+
+	cp -pP "${src}" "${DESTDIR}/${target}" || return $(($? + 1))
+}
+
+
+# Copy an executable or shared library to the initramfs:
+# $1 = source file name
+# $2 (optional) = target file or directory name in the initramfs
+#
+# The source and all its shared library dependencies are copied
+# using copy_file.
+#
+# Returns:
+# * If the files were copied successfully or already exited, 0
+# * On error, >0
 copy_exec_not_link() {
-	local source target destination final_destination x nonoptlib
-	local libname dirname
+	local src target x nonoptlib ret
 
-	source="${1}"
-	if [ -n "${2}" ]; then
-		target="${2}"
-	else
-		if [ ! -e "${DESTDIR}/$(dirname "${1}")" ]; then
-			mkdir -p "${DESTDIR}/$(dirname "${1}")"
-		fi
-		target="${1}"
-	fi
+	src="${1}"
+	target="${2:-$1}"
 
-	if [ -d "${DESTDIR}/${target}" ]; then
-		destination="${target}/$(basename "${source}")"
-	else
-		destination="${target}"
-	fi
-	final_destination="${DESTDIR}/${destination}"
-
-	if [ -L "$final_destination" ]; then
-		if [ $(readlink "${final_destination}") != "${source}" ]; then
-			echo "W:copy_exec_not_link: Not copying ${source} to \$DESTDIR${destination}, which is already a copy of $(readlink ${final_destination})" >&2
-			return
-		fi
-	else
-		cp -pL ${source} ${DESTDIR}/${destination}
-		if [ "${verbose}" = "y" ]; then
-			echo "Adding binary ${source}"
-		fi
-	fi
+	copy_file binary "${src}" "${target}" || return $(($? - 1))
 
 	# Copy the dependant libraries
-	for x in $(ldd ${source} 2>/dev/null | sed -e '
-	    /\//!d;
-	    /linux-gate/d;
-	    /=>/ {s/.*=>[[:blank:]]*\([^[:blank:]]*\).*/\1/};
-	    s/[[:blank:]]*\([^[:blank:]]*\) (.*)/\1/' 2>/dev/null); do
+	for x in $(env --unset=LD_PRELOAD ldd "${src}" 2>/dev/null | sed -e '
+		/^[^\t]/d;
+		/\//!d;
+		/linux-gate/d;
+		/=>/ {s/.*=>[[:blank:]]*\([^[:blank:]]*\).*/\1/};
+		s/[[:blank:]]*\([^[:blank:]]*\) (.*)/\1/' 2>/dev/null); do
 
 		# Try to use non-optimised libraries where possible.
 		# We assume that all HWCAP libraries will be in tls,
-		# sse2, vfp or neon
-		nonoptlib=$(echo "${x}" | sed -e 's#/lib/\(tls\|i686\|sse2\|neon\|vfp\).*/\(lib.*\)#/lib/\2#')
+		# sse2, vfp or neon.
+		nonoptlib=$(echo "${x}" | sed -e 's#/lib/\([^/]*/\)\?\(tls\|i686\|sse2\|neon\|vfp\).*/\(lib.*\)#/lib/\1\3#')
+		nonoptlib=$(echo "${nonoptlib}" | sed -e 's#-linux-gnu/\(tls\|i686\|sse2\|neon\|vfp\).*/\(lib.*\)#-linux-gnu/\2#')
 
 		if [ -e "${nonoptlib}" ]; then
 			x="${nonoptlib}"
 		fi
 
-		libname=$(basename "${x}")
-		dirname=$(dirname "${x}")
+		# Handle common dlopen() dependency (Debian bug #950254)
+		case "${x}" in
+		*/libpthread.so.*)
+			copy_libgcc || return
+			;;
+		esac
 
-		mkdir -p "${DESTDIR}/${dirname}"
-		if [ ! -e "${DESTDIR}/${dirname}/${libname}" ]; then
-			cp -pL "${x}" "${DESTDIR}/${dirname}"
-			if [ "${verbose}" = "y" ]; then
-				echo "Adding library ${x}"
-			fi
-		fi
+		copy_file binary "${x}" || {
+			ret=$?
+			[ ${ret} = 1 ] || return $((ret - 1))
+		}
 	done
-} # end of copy_exec_not_link
+}
+
+# Copy libgcc_s.so for the running architecture to the initramfs.
+# This function takes no parameter.
+#
+# Returns:
+# * If the library was copied successfully or already existed, 0
+# * On error, >0
+copy_libgcc() {
+	local libdir library
+
+	for libdir in $(ld.so --list-diagnostics | sed -n 's/^path.system_dirs.*="\(.*\)"$/\1/p'); do
+		for library in "${libdir}"/libgcc_s.so.[1-9]; do
+			[ -e "$library" ] || continue
+			copy_exec "${library}" || return
+		done
+	done
+}

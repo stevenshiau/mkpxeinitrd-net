@@ -1,13 +1,13 @@
 #!/bin/bash
 # Steven Shiau <steven _at_ nchc org tw>, Ceasar Sun <ceasar _at_ nchc org tw>
 # License: GPL
-# Description: To parse the /lib/modules/$KERNEL to get the modules for nfs
+# Description: To parse the /usr/lib/modules/$KERNEL to get the modules for nfs
 
 #
 usage() {
  echo Usage: $0 [OPTION] KERNEL_VERSION
  echo "OPTION:"
- echo " -p|--prefix PATH   Add the prefix PATH so it will use the modules.deps  in PATH/lib/modules/."
+ echo " -p|--prefix PATH   Add the prefix PATH so it will use the modules.deps  in PATH/usr/lib/modules/."
  echo " -k|--kernel-ver KVER   Use kernel version KVER for DRBL client."
  echo " -h|--help          Show the usage info."
  echo "Ex: $0 -k 2.6.26-2-686"
@@ -41,20 +41,20 @@ done
 # For Ubuntu Jaunty, kernel 2.6.28-11, the modules.dep is like:
 # kernel/fs/nfs/nfs.ko: kernel/fs/lockd/lockd.ko kernel/fs/nfs_common/nfs_acl.ko kernel/net/sunrpc/sunrpc.ko
 # For older Linux distributions, the modules.dep is like:
-# /lib/modules/2.6.26-1-686/kernel/fs/nfs/nfs.ko: /lib/modules/2.6.26-1-686/kernel/fs/lockd/lockd.ko /lib/modules/2.6.26-1-686/kernel/fs/nfs_common/nfs_acl.ko /lib/modules/2.6.26-1-686/kernel/net/sunrpc/sunrpc.ko
-# Therefore we have to judge from $PREFIX/lib/modules/$kver/modules.dep. We do not have to check all the content of modules.dep, just the first few lines will be enough. (just in case, here we choose 10 lines)
-if [ -z "$(head -n 10 $PREFIX/lib/modules/$kver/modules.dep | grep -E "^/lib/modules/")" ]; then
+# /usr/lib/modules/2.6.26-1-686/kernel/fs/nfs/nfs.ko: /usr/lib/modules/2.6.26-1-686/kernel/fs/lockd/lockd.ko /usr/lib/modules/2.6.26-1-686/kernel/fs/nfs_common/nfs_acl.ko /usr/lib/modules/2.6.26-1-686/kernel/net/sunrpc/sunrpc.ko
+# Therefore we have to judge from $PREFIX/usr/lib/modules/$kver/modules.dep. We do not have to check all the content of modules.dep, just the first few lines will be enough. (just in case, here we choose 10 lines)
+if [ -z "$(head -n 10 $PREFIX/usr/lib/modules/$kver/modules.dep | grep -E "^/usr/lib/modules/")" ]; then
   # New style, like kernel/fs/nfs/nfs.ko:...
   nfs_mod_path="kernel/fs/nfs"
 else
-  # Old style, like /lib/modules/2.6.26-1-686/kernel/fs/nfs/nfs.ko:...
-  nfs_mod_path="/lib/modules/$kver/kernel/fs/nfs"
+  # Old style, like /usr/lib/modules/2.6.26-1-686/kernel/fs/nfs/nfs.ko:...
+  nfs_mod_path="/usr/lib/modules/$kver/kernel/fs/nfs"
 fi
 
 # Regure expression to grep the nfs.ko
 # From Linux kernel 3.6.x, the modules for NFS are:
 # nfs.ko  nfs_layout_nfsv41_files.ko  nfsv2.ko  nfsv3.ko  nfsv4.ko
-# They are found in dir like /lib/modules/3.6.1-1.fc17.i686/kernel/fs/nfs/.
+# They are found in dir like /usr/lib/modules/3.6.1-1.fc17.i686/kernel/fs/nfs/.
 nfs_mod_reg="^$nfs_mod_path/nfs.*\.ko(\.gz|\.xz|\.zst)*:"
 
 # Actually for NFS, we do not have to exclude some module now, but who knows in
@@ -69,12 +69,12 @@ exclude_opt="$(echo $exclude_opt | sed -e "s/^|//g")"
 # we get the path is relative path like:
 # kernel/drivers/net/8139too.ko
 # Then it's easier for us to copy them.
-# Note!!! sed -e "s|^/lib/modules/$kver/||", the / after $kver is very important
+# Note!!! sed -e "s|^/usr/lib/modules/$kver/||", the / after $kver is very important
 # Do ***NOT*** remove that!
 (
   # get the nfs modules itself
-  grep -E "$nfs_mod_reg" $PREFIX/lib/modules/$kver/modules.dep | grep -vE "($exclude_opt)" | awk -F":" '{print $1}' 
+  grep -E "$nfs_mod_reg" $PREFIX/usr/lib/modules/$kver/modules.dep | grep -vE "($exclude_opt)" | awk -F":" '{print $1}' 
 
   # get those depended modules
-  grep -E "$nfs_mod_reg" $PREFIX/lib/modules/$kver/modules.dep | grep -vE "($exclude_opt)" | awk -F":" '{print $2}' | awk -F' ' '{for (i = 1; i <= NF; i = i + 1) print $i}'
-) | sort | uniq | sed -e "s|^/lib/modules/$kver/||"
+  grep -E "$nfs_mod_reg" $PREFIX/usr/lib/modules/$kver/modules.dep | grep -vE "($exclude_opt)" | awk -F":" '{print $2}' | awk -F' ' '{for (i = 1; i <= NF; i = i + 1) print $i}'
+) | sort | uniq | sed -e "s|^/usr/lib/modules/$kver/||"
