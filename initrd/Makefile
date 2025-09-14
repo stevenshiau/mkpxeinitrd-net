@@ -41,52 +41,59 @@ initrd-skel : $(UTILS) linuxrc-or-init udhcpc-post
 	rm -rf $@
 	mkdir -p $@
 	mkdir -p $@/etc
-	mkdir -p $@/bin
-	ln -s bin $@/sbin
-	install -m 755 busybox scan_pci ls_pciid.sh get-nic-devs insert-modules $@/bin/
+	mkdir -p $@/usr/bin
+	mkdir -p $@/usr/sbin
+	mkdir -p $@/usr/lib
+	mkdir -p $@/usr/lib64
+	ln -s -t $@ usr/bin
+	ln -s -t $@ usr/sbin
+	ln -s -t $@ usr/lib
+	ln -s -t $@ usr/lib64
+	(cd $@/usr/sbin; ln -s bin sbin)
+	install -m 755 busybox scan_pci ls_pciid.sh get-nic-devs insert-modules $@/usr/bin/
 	install -m 644 pcitable pci.ids linuxrc.conf netdev.conf modules $@/etc/
-	ln -s busybox $@/bin/sh
-	ln -s busybox $@/bin/echo
-	ln -s busybox $@/bin/mknod
-	ln -s busybox $@/bin/chmod
-	ln -s busybox $@/bin/ifconfig
-	ln -s busybox $@/bin/route
-	#ln -s busybox $@/bin/mount
-	ln -s busybox $@/bin/pivot_root
-	#ln -s busybox $@/bin/umount
-	ln -s busybox $@/bin/[
-	ln -s busybox $@/bin/grep
-	ln -s busybox $@/bin/sed
-	ln -s busybox $@/bin/cat
-	ln -s busybox $@/bin/cut
-	ln -s busybox $@/bin/sort
-	ln -s busybox $@/bin/head
-	ln -s busybox $@/bin/uniq
-	#ln -s busybox $@/bin/insmod
-	#ln -s busybox $@/bin/modprobe
-	#ln -s busybox $@/bin/rmmod
-	#ln -s busybox $@/bin/lsmod
-	ln -s busybox $@/bin/ping
-	ln -s busybox $@/bin/df
-	ln -s busybox $@/bin/id
-	ln -s busybox $@/bin/more
-	ln -s busybox $@/bin/ln
-	ln -s busybox $@/bin/ls
-	ln -s busybox $@/bin/gunzip
-	ln -s busybox $@/bin/uname
-	ln -s busybox $@/bin/tr
-	ln -s busybox $@/bin/mkdir
-	ln -s busybox $@/bin/rm
+	ln -s busybox $@/usr/bin/sh
+	ln -s busybox $@/usr/bin/echo
+	ln -s busybox $@/usr/bin/mknod
+	ln -s busybox $@/usr/bin/chmod
+	ln -s busybox $@/usr/bin/ifconfig
+	ln -s busybox $@/usr/bin/route
+	#ln -s busybox $@/usr/bin/mount
+	ln -s busybox $@/usr/bin/pivot_root
+	#ln -s busybox $@/usr/bin/umount
+	ln -s busybox $@/usr/bin/[
+	ln -s busybox $@/usr/bin/grep
+	ln -s busybox $@/usr/bin/sed
+	ln -s busybox $@/usr/bin/cat
+	ln -s busybox $@/usr/bin/cut
+	ln -s busybox $@/usr/bin/sort
+	ln -s busybox $@/usr/bin/head
+	ln -s busybox $@/usr/bin/uniq
+	#ln -s busybox $@/usr/bin/insmod
+	#ln -s busybox $@/usr/bin/modprobe
+	#ln -s busybox $@/usr/bin/rmmod
+	#ln -s busybox $@/usr/bin/lsmod
+	ln -s busybox $@/usr/bin/ping
+	ln -s busybox $@/usr/bin/df
+	ln -s busybox $@/usr/bin/id
+	ln -s busybox $@/usr/bin/more
+	ln -s busybox $@/usr/bin/ln
+	ln -s busybox $@/usr/bin/ls
+	ln -s busybox $@/usr/bin/gunzip
+	ln -s busybox $@/usr/bin/uname
+	ln -s busybox $@/usr/bin/tr
+	ln -s busybox $@/usr/bin/mkdir
+	ln -s busybox $@/usr/bin/rm
 	# busybox 1.0 has udhcpc
-	ln -s busybox $@/bin/udhcpc
-	ln -s busybox $@/bin/switch_root
-	ln -s busybox $@/bin/mountpoint
-	ln -s busybox $@/bin/wc
-	ln -s busybox $@/bin/ps
-	ln -s busybox $@/bin/xargs
+	ln -s busybox $@/usr/bin/udhcpc
+	ln -s busybox $@/usr/bin/switch_root
+	ln -s busybox $@/usr/bin/mountpoint
+	ln -s busybox $@/usr/bin/wc
+	ln -s busybox $@/usr/bin/ps
+	ln -s busybox $@/usr/bin/xargs
 
 	install -m 755 linuxrc-or-init $@/linuxrc-or-init
-	install -m 755 udhcpc-post $@/bin/udhcpc-post
+	install -m 755 udhcpc-post $@/usr/bin/udhcpc-post
 	cd $@/etc; ln -s ../dev/resolv.conf resolv.conf
 
 tftpboot/initrd-%.img : initrd-skel
@@ -94,8 +101,8 @@ tftpboot/initrd-%.img : initrd-skel
 
 prefix = $(DESTDIR)/usr
 sysconfdir = /etc
-bindir = $(prefix)/bin
-libdir = $(prefix)/lib
+bindir = $(prefix)/usr/bin
+libdir = $(prefix)/usr/lib
 mandir = $(prefix)/share/man
 docdir = $(prefix)/share/doc
 initrdskeldir = $(libdir)/mkpxeinitrd-net/initrd-skel
