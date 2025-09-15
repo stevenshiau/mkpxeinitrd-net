@@ -1,3 +1,11 @@
+mkpxeinitrd-net (2.6.1-drbl1) unstable; urgency=medium
+
+  * Switched to use /usr/{sbin,bin,lib,lib64} mainly instead of
+    {sbin,bin,lib,lib64}.
+    This will make it work better in Debian 13.
+
+ -- Steven Shiau <steven@clonezilla.org>  Sun, 14 Sep 2025 20:22:49 +0800
+
 mkpxeinitrd-net (2.5.9-drbl1) unstable; urgency=medium
 
   * Linux kernel modules might be in zstd format. Hence parse-net-mod &
