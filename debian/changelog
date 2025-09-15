@@ -1,3 +1,9 @@
+mkpxeinitrd-net (2.6.1-drbl2) unstable; urgency=medium
+
+  * Fixed the path in Makefile. 
+
+ -- Steven Shiau <steven@clonezilla.org>  Mon, 15 Sep 2025 20:54:18 +0800
+
 mkpxeinitrd-net (2.6.1-drbl1) unstable; urgency=medium
 
   * Switched to use /usr/{sbin,bin,lib,lib64} mainly instead of

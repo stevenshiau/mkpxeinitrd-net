@@ -101,8 +101,8 @@ tftpboot/initrd-%.img : initrd-skel
 
 prefix = $(DESTDIR)/usr
 sysconfdir = /etc
-bindir = $(prefix)/usr/bin
-libdir = $(prefix)/usr/lib
+bindir = $(prefix)/bin
+libdir = $(prefix)/lib
 mandir = $(prefix)/share/man
 docdir = $(prefix)/share/doc
 initrdskeldir = $(libdir)/mkpxeinitrd-net/initrd-skel
