@@ -42,14 +42,13 @@ initrd-skel : $(UTILS) linuxrc-or-init udhcpc-post
 	mkdir -p $@
 	mkdir -p $@/etc
 	mkdir -p $@/usr/bin
-	mkdir -p $@/usr/sbin
 	mkdir -p $@/usr/lib
 	mkdir -p $@/usr/lib64
 	ln -s -t $@ usr/bin
 	ln -s -t $@ usr/sbin
 	ln -s -t $@ usr/lib
 	ln -s -t $@ usr/lib64
-	(cd $@/usr/sbin; ln -s bin sbin)
+	(cd $@/usr/; ln -s bin sbin)
 	install -m 755 busybox scan_pci ls_pciid.sh get-nic-devs insert-modules $@/usr/bin/
 	install -m 644 pcitable pci.ids linuxrc.conf netdev.conf modules $@/etc/
 	ln -s busybox $@/usr/bin/sh
