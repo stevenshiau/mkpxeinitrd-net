@@ -1,3 +1,9 @@
+mkpxeinitrd-net (2.6.1-drbl3) unstable; urgency=medium
+
+  * Fixed links in Makefile.
+
+ -- Steven Shiau <steven@clonezilla.org>  Wed, 17 Sep 2025 15:41:31 +0800
+
 mkpxeinitrd-net (2.6.1-drbl2) unstable; urgency=medium
 
   * Fixed the path in Makefile. 

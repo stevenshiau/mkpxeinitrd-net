@@ -1,6 +1,6 @@
 #!/bin/bash
 # -*-Shell-script-*-
-# Function copy_exec_not_link is borrowed from copy_exec from Debian's package initramfs-tools: /usr/share/initramfs-tools/hook-functions. 
+# Function copy_exec is borrowed from Debian's package initramfs-tools: /usr/share/initramfs-tools/hook-functions. 
  # find . | cpio --quiet -o -H newc | gzip -9 > $output_dir/initrd-$initrd_suffix.$kernel_ver.img )
  # instead of
  # find . | cpio --quiet --dereference -o -H newc | gzip -9 > $output_dir/initrd-$initrd_suffix.$kernel_ver.img )
@@ -13,13 +13,13 @@
 # The destination is interpreted in the same way "cp" would, meaning
 # (assuming /bin is a directory):
 #
-#   "copy_exec_not_link /usr/bin/time /bin"        -> /bin/time
-#   "copy_exec_not_link /usr/bin/time /bin/mytime" -> /bin/mytime
+#   "copy_exec /usr/bin/time /bin"        -> /bin/time
+#   "copy_exec /usr/bin/time /bin/mytime" -> /bin/mytime
 # 
 # If $2 is left out, the same destination path as for the source arg will
 # be used and directories will be created as needed, so:
 #
-#   "copy_exec_not_link /usr/bin/time"             -> /usr/bin/time
+#   "copy_exec /usr/bin/time"             -> /usr/bin/time
 #
 
 # Copy a file to the initramfs:
@@ -121,7 +121,7 @@ copy_file() {
 # Returns:
 # * If the files were copied successfully or already exited, 0
 # * On error, >0
-copy_exec_not_link() {
+copy_exec() {
 	local src target x nonoptlib ret
 
 	src="${1}"

@@ -147,7 +147,7 @@ initrd="$(mktemp -d ${tmpdir}/initrd.XXXXXX)"
 initrdimg="$(mktemp ${tmpdir}/initrd.img.XXXXXX)"
 initrdmnt="$(mktemp -d ${tmpdir}/initrd.mnt.XXXXXX)"
 
-# Variable DESTDIR is required for copy_exec_not_link use later
+# Variable DESTDIR is required for copy_exec use later
 export DESTDIR="$initrd"
 
 # Copy skeleton into temporary area
@@ -429,10 +429,10 @@ elif [ -n "$(echo $kernel_ver | grep -E "(^2\.6\.|^3\.|^4\.|^5\.|^6\.)")" ]; the
    # The files could be /usr/lib/udev/firmware.agent, /usr/lib/udev/firmware.sh or usr//lib/udev/firmware (ubuntu 10.04)
    for i in /usr/lib/udev/*firmware*; do
      [ ! -e "$i" ] && continue
-     copy_exec_not_link $i
+     copy_exec $i
    done
    # More files will be copied in /usr/lib/mkpxeinitrd-net/hooks/udev later
-   # The copy_exec_not_link in hooks/udev will honor variable DESTDIR
+   # The copy_exec in hooks/udev will honor variable DESTDIR
    echo "Calling hook udev..."
    /usr/lib/mkpxeinitrd-net/hooks/udev
   )
@@ -448,14 +448,14 @@ fi
 if [ "$include_splash" = "yes" -a -e /usr/sbin/usplash -a -e /usr/sbin/usplash_write ]; then
   mkdir -p ${DESTDIR}/usr/lib/usplash
   
-  copy_exec_not_link /usr/sbin/usplash /usr/sbin
-  copy_exec_not_link /usr/sbin/usplash_write /usr/sbin
+  copy_exec /usr/sbin/usplash /usr/sbin
+  copy_exec /usr/sbin/usplash_write /usr/sbin
   if [ -f /etc/usplash.conf ]; then
-  	copy_exec_not_link /etc/usplash.conf /etc
+  	copy_exec /etc/usplash.conf /etc
   fi
   
   if [ -f /usr/lib/usplash/usplash-artwork.so ]; then
-      copy_exec_not_link /usr/lib/usplash/usplash-artwork.so /usr/lib/usplash
+      copy_exec /usr/lib/usplash/usplash-artwork.so /usr/lib/usplash
   fi
 fi
 
@@ -464,7 +464,7 @@ fi
   mount_required_etc="services protocols netconfig nsswitch.conf nfsmount.conf"
   for i in $mount_required_etc; do
     [ ! -e /etc/$i ] && continue
-    copy_exec_not_link /etc/$i /etc/
+    copy_exec /etc/$i /etc/
   done
 # /lib/libnss_file* and libnss_nis* are required for mount.nfs, which ldd won't show. We found that by strace.
   # Since libnss_files could be in /lib/, /lib/i386-linux-gnu (Debian), /lib64/ (Fedora)... We search them.
@@ -475,14 +475,14 @@ fi
   for i in $LIBNSS_FILES; do
     DIRNM="$(dirname $i)"
     mkdir -p $DESTDIR/$DIRNM
-    copy_exec_not_link $i $DIRNM
+    copy_exec $i $DIRNM
   done
 # Some required bin programs, which are not provided by busybox. E.g. ethtool
 for i in $include_bin_prog_from_server; do
   [ "$verbose" = "-v" ] && echo "Finding program $i on the server..."
   if which $i &>/dev/null; then
     [ "$verbose" = "-v" ] && echo "Including $i in the PXE initrd..."
-    copy_exec_not_link $(which $i) /usr/bin/
+    copy_exec $(which $i) /usr/bin/
     # Make sure the owner is root, otherwise the error "mount: only root can do that (effective UID is xxxxxx)" might occur.
     chown root:root $DESTDIR/usr/bin/$i
   fi

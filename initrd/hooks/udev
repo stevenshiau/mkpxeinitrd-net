@@ -23,13 +23,13 @@ esac
 . /usr/lib/mkpxeinitrd-net/bin/mkpxeinitrd-net-func
 
 # We use pkill
-copy_exec_not_link /usr/bin/pkill /sbin
+copy_exec /usr/bin/pkill /sbin
 
 # Copy across the udev binaries
-[ -e /sbin/udevd ] && copy_exec_not_link /sbin/udevd /sbin
-[ -e /usr/lib/systemd/systemd-udevd ] && copy_exec_not_link /usr/lib/systemd/systemd-udevd
-[ -e /lib/systemd/systemd-udevd ] && copy_exec_not_link /lib/systemd/systemd-udevd
-[ -e /sbin/udevadm ] && copy_exec_not_link /sbin/udevadm /sbin
+[ -e /sbin/udevd ] && copy_exec /sbin/udevd /sbin
+[ -e /usr/lib/systemd/systemd-udevd ] && copy_exec /usr/lib/systemd/systemd-udevd
+[ -e /lib/systemd/systemd-udevd ] && copy_exec /lib/systemd/systemd-udevd
+[ -e /sbin/udevadm ] && copy_exec /sbin/udevadm /sbin
 
 # Copy udev configuration
 mkdir -p ${DESTDIR}/etc/udev
@@ -65,7 +65,7 @@ lib_udev_files_list="modprobe rename_device pci-db hwclock-set net.agent console
 
 # (1) For /sbin/ first
 for i in $sbin_udev_files_list; do
-  [ -e "/sbin/$i" ] && copy_exec_not_link /sbin/$i /sbin/
+  [ -e "/sbin/$i" ] && copy_exec /sbin/$i /sbin/
 done
 
 # (2) Then for /lib/udev
@@ -77,12 +77,12 @@ for i in /lib/udev/*_id /lib/udev/udev* /lib/udev/udisks*; do
   lib_udev_files_list="$lib_udev_files_list $(basename $i)"
 done
 for i in $lib_udev_files_list; do
-  [ -e "/lib/udev/$i" ] && copy_exec_not_link /lib/udev/$i /lib/udev/
+  [ -e "/lib/udev/$i" ] && copy_exec /lib/udev/$i /lib/udev/
 done
 
 # For RH-like system
 if [ -e "/etc/sysconfig/network-scripts/net.hotplug" ]; then
   # DESTDIR is the environmental variable.
   mkdir -p $DESTDIR/etc/sysconfig/network-scripts/
-  copy_exec_not_link /etc/sysconfig/network-scripts/net.hotplug /etc/sysconfig/network-scripts/
+  copy_exec /etc/sysconfig/network-scripts/net.hotplug /etc/sysconfig/network-scripts/
 fi
