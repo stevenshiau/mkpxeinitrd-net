@@ -1,3 +1,11 @@
+mkpxeinitrd-net (2.6.2-drbl1) unstable; urgency=medium
+
+  * Updated functions, use name copy_exec instead of copy_exec_not_link.
+    Removed useless hook files: nfsv4-client, usplash
+  * Updated Makefile for linking dirs.
+
+ -- Steven Shiau <steven@clonezilla.org>  Wed, 17 Sep 2025 18:35:33 +0800
+
 mkpxeinitrd-net (2.6.1-drbl3) unstable; urgency=medium
 
   * Fixed links in Makefile.
